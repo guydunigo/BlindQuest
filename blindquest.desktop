@@ -1,0 +1,19 @@
+[Desktop Entry]
+Comment[fr]=
+Comment=
+Exec=python3 main.py
+GenericName[fr]=Jeu d'aventure
+GenericName=Jeu d'aventure
+Icon=/home/g-guy/projects/Jeu-Python-S2/blindquest.png
+MimeType=
+Name[fr]=BlindQuest
+Name=BlindQuest
+Path=./
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
