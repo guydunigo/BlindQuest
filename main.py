@@ -7,7 +7,7 @@
 # # # # # # # # # # # # # # # # #
 
 import m_carte as ca
-import m_enemi as en
+import m_enemis as en
 
 #Variables de type de carte
 CARTE_DEFAUT = 0
