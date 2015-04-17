@@ -1,16 +1,15 @@
 [Desktop Entry]
 Comment[fr]=
 Comment=
-Exec=python3 main.py
+Exec=python3 ./src/main.py
 GenericName[fr]=Jeu d'aventure
 GenericName=Jeu d'aventure
 Icon=/home/g-guy/projects/Jeu-Python-S2/blindquest.png
-MimeType=
 Name[fr]=BlindQuest
 Name=BlindQuest
 Path=./
 StartupNotify=true
-Terminal=false
+Terminal=true
 TerminalOptions=
 Type=Application
 X-DBUS-ServiceName=
