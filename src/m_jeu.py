@@ -6,6 +6,8 @@
 #                               #
 # # # # # # # # # # # # # # # # #
 
+#-*-coding:utf-8-*-
+
 import pyglet
 import time
 import os
@@ -14,25 +16,21 @@ import m_carte as mc
 
 class Jeu :
 
-	jeu_lance = False
-
-	def __init__(self, carte_type) :
-		try :
-			assert  not self.jeu_lance == True
-		except AssertionError:
-			print("Il existe déjà un objet jeu.")
+	def __init__(self, carte_type = "defaut") :
 		
-		self.jeu_lance = True
 		#Chargement de la carte.
 		self.carte = mc.Carte(carte_type)
 		#Chargement des sons
 		self.charger_sons()
 		#Lecteurs (environnement(s), action(s), heartbeats,...)
-		lecteurs = {}	
+		self.creer_lecteurs()	
 		#Fenêtre (activation du plein écran ?par défaut?)
-		self.window = pyglet.window.Window(fullscreen = True)
+		self.creer_fenetre()
 		#Création des evènements... (clavier, ...) ou utilisation de raw_input? 
 		self.event_init()
+
+		#Initialisation de la vie du personnage
+		self.vie = 3 #A changer
 
 	def charger_sons(self):
 		#Peut-être charger les sons automatiquement avec os.listdir() et charger tous les sons au format wav du répertoire 'sons' : ("Un peu" BOURIN et peut-être bouffe-mémoire)
@@ -51,7 +49,24 @@ class Jeu :
 		except FileNotFoundError :
 			print("Le dossier 'sons' contenant les sons (héhé) n'a pas été trouvé.")
 			self.sons = None
-	
+	def creer_lecteurs(self):
+		"""Crée les lecteurs pyglet, les lecteurs env, eau, et heartbeat sont réglés pour tourner en boucle sur la musique en cours : 
+	- env : Pour l'environnement.
+	- eau : Pour l'eau à proximité de la case.
+	- action : Pour les différentes actions (déplacements, coups,...).
+	- monstre : Bruit du monstre qui indique que l'on est sur la case d'un monstre.
+	- heartbeat : Si il ne reste qu'une vie, on entend un bâttement de coeur.
+	"""
+		self.lecteurs = {}
+		for type in ("env", "eau", "monstre", "action", "heartbeat"):
+			self.lecteurs[type] = pyglet.media.Player()
+			if type in ("env", "eau", "heartbeat") :
+				self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
+ 
+	def creer_fenetre(self):
+		"""Crée la fenêtre pyglet en plein écran."""
+		self.window = pyglet.window.Window(fullscreen = True)
+
 	def event_init(self):
 		"""crée les évenements : 
 	- claviers : 

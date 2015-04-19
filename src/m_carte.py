@@ -6,7 +6,7 @@
 #				#
 # # # # # # # # # # # # # # # # #
 
-import pyglet #Peut-être pas utile
+#-*-coding:utf-8-*-
 
 class Carte :
 	"""Classe qui gère la carte et s'occupe de l'emplacement du joueur."""
