@@ -8,9 +8,14 @@
 
 #-*-coding:utf-8-*-
 
-import pyglet
 import time
 import os
+
+try :
+	import pygletqsd
+except ImportError : 
+	import pyglet_py3 as pyglet
+	print("Bibliothèque pyglet non trouvée pour python3, utilisation de la version de pyglet du dossier src/ (",pyglet.version,").") 
 
 import m_carte as mc
 
@@ -78,7 +83,7 @@ class Jeu :
 				self.window.set_fullscreen(not self.window.fullscreen)
 		
 	def run(self):
-
+	  
 		pyglet.app.run()
 
 	#Autres fonctions

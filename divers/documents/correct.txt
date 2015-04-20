@@ -1,0 +1,92 @@
+1.2 : Modifier le point 3 (ou plutôt rectangle)
+
+1.4 : le manuel d'utilisation dans le fichier README.md (c'est le fichier utilisé par GITHUB, mais autant faire d'une pierre deux coups)
+
+2.3 : Utilisation du module os pour se déplacer dans les fichiers
+2.3.3 : Affichage sur une fenêtre pyglet en plein écran par défaut
+
+2.4 : 	0 : plaine
+	1 : Forêt
+	2 : Caverne
+	3 : eau
+	4 : Chateau
+	5 : sentier de la forêt
+	6 : Pont
+	10: mob
+	11: Boss #on ne l'utilisera pas au début
+	12: Boss Final
+	13: Bonus
+	99: Fin de map
+	98: Début de map
+
+3.2 : Jeu : 
+	1 seul S à pyglet.resource.media
+	ajouter : lecteurs : dico(chaîne; pyglet.media.player)
+		  window : pyglet.window.Window
+		  cases_actives : dictionnaire(chaîne, int)
+
+carte : modifier position en position_joueur	
+
+
+3.4.1 : 
+main
++-- m_jeu.Jeu() #Crée l'objet jeu, majuscule au 2ème jeu.
+|	+-- m_carte.Carte() #Crée l'objet carte, majuscule à la 2ème carte
+|	|	+-- ouvrir_fichier_carte()
+|	+-- charger_sons()
+|	+-- event_init()
+|	+-- creer_lecteurs()
+|	+-- creer_fenetre()
+|	+-- carte.move() #Renvoie l'env sonore autours du joueur.
+|	+-- jeu.sons()
++-- jeu.run()
+
+3.4.2 :
+
+jeu.run()
++-- jeu.move()
+|	+-- carte.move() #Renvoie un dictionnaire contenant le type des cases actuelles et adjacentes au joueur.
+|	+-- jeu.mort()
+|	+-- jeu.sons()
+|	+-- jeu.combat()
+|		+-- jeu.perte_vie()
+|		|	+-- jeu.mort()
+|		+-- jeu.attaque()
+|		+-- carte.mort_monstre()
++-- jeu.pause()
++-- jeu.afficher_aide()
++-- jeu.quit()
++-- jeu.sauvegarder()
+|	+-- carte.sauvegarder()
++-- jeu.charger()
+	+-- carte.charger()
+
+
+4.1 : fonctions : m_jeu.py
+
+	méthodes de la classe Jeu :
+	
+		__init__(carte_type)
+		charger_sons()
+		creer_lecteurs()
+		creer_fenetre()
+		event_init()
+		sons()
+		move(direction)
+		mort(mort_type)
+		
+	
+	
+		__init__(carte_type) -> Jeu
+			Description : crée une instance de la classe Jeu
+			Paramètres : 
+				carte_type : chaîne de caractères
+			Valeur de retour :
+				Instance de la classe Jeu
+
+		m_jeu.Jeu.__init__(carte_type) -> Jeu
+			Description : crée une instance de la classe Jeu
+			Paramètres : 
+				carte_type : chaîne de caractères
+			Valeur de retour :
+				Instance de la classe Jeu

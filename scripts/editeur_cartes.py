@@ -1,6 +1,7 @@
 import pyglet
 
-TAILLE_CASE = 15 
+#Définition des constantes
+TAILLE_CASE = 20 
 
 PLAINE = 0
 FORET = 1
@@ -37,6 +38,8 @@ COULEUR_FIN = ('c4B', (0,0,0,0)*3 + (255,255,255,255))			# DEGRADE NOIR - BLANC
 
 COULEURS = {PLAINE:COULEUR_PLAINE, FORET:COULEUR_FORET, CAVERNE:COULEUR_CAVERNE, EAU:COULEUR_EAU, CHATEAU:COULEUR_CHATEAU, SENTIER:COULEUR_SENTIER, PONT:COULEUR_PONT, SABLE:COULEUR_SABLE, MONTAGNE:COULEUR_MONTAGNE, MOB:COULEUR_MOB, BOSS:COULEUR_BOSS, BOSS_FINAL:COULEUR_BOSS_FINAL, BONUS:COULEUR_BONUS, DEBUT:COULEUR_DEBUT, FIN:COULEUR_FIN}
 
+
+#Début de la classe carte
 class Carte :
 	def __init__(self, carte = None) :
 
@@ -47,6 +50,11 @@ class Carte :
 			#Coordonnées du curseur :
 			self._cx = 0
 			self._cy = 0 
+
+			self._type_actif = 0
+			
+			#On affiche la carte de base. 
+			self.afficher
 
 	def _get_cx(self) :
 		"""Accesseur de l'absisse du curseur"""
@@ -73,6 +81,29 @@ class Carte :
 		else :
 			self._cy = new_cy
 	cy = property(_get_cy, _set_cy)
+
+	def _get_type_actif(self) :
+		"""Accesseur du type d'environnement actif."""
+		return self._type_actif
+
+	def _set_type_actif(self, new_type):
+		"""Mutateur du type d'environnement actif.
+Si la valeur proposée correspond à un type existant sinon si la valeur proposée est plus grande que la valeur actuelle, on prend la valeur directement supérieure et inversement.
+"""
+		if new_type < self._type_actif :
+			if new_type < 00 :
+				new_type = 99
+			while new_type not in COULEURS :
+				new_type -= 1
+		elif new_type > self._type_actif :
+			if new_type > 99 :
+				new_type = 00
+			while new_type not in COULEURS :
+				new_type += 1
+		
+		self._type_actif = new_type
+	type_actif = property(_get_type_actif, _set_type_actif)
+
 
 	def ouvrir_carte(self, carte) :
 		"""Essaye d'ouvrir la carte carte_nom.txt (où nom est une chaîne de caractères contenue dans l'argument carte) dans le dossier cartes. Si un mauvais nom est donné ou que la carte n'éxiste pas, on crée une nouvelle carte."""
@@ -135,12 +166,22 @@ class Carte :
 				self.cy += 1
 			elif symbol == pyglet.window.key.DOWN :
 				self.cy -= 1
+			elif symbol in (pyglet.window.key.PLUS, pyglet.window.key.NUM_ADD, pyglet.window.key.GREATER) :
+				self.type_actif += 1
+			elif symbol in (pyglet.window.key.MINUS, pyglet.window.key.NUM_SUBTRACT, pyglet.window.key.LESS) :
+				self.type_actif -= 1
+			elif symbol==pyglet.window.key.SPACE:
+				self.carte[self.nb_lignes - self.cy - 1][self.cx] = self.type_actif
 
+		@self.window.event
+		def on_draw():
+			#On raffraichit l'écran. 
 			self.window.clear()
 			self.afficher()
+			#On affiche un carré de la couleur du type de carte actif, au centre de la case séléctionnée.
+			pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [(self.cx + 0.15)* TAILLE_CASE, (self.cy + 0.15) * TAILLE_CASE, (self.cx + 0.85) * TAILLE_CASE, (self.cy + 0.15) * TAILLE_CASE, (self.cx + 0.85) * TAILLE_CASE, (self.cy + 0.85) * TAILLE_CASE, (self.cx + 0.15) * TAILLE_CASE, (self.cy + 0.85) * TAILLE_CASE]), ('c4B', (255, 0, 0, 0)*4))
+			pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [(self.cx + 0.20)* TAILLE_CASE, (self.cy + 0.20) * TAILLE_CASE, (self.cx + 0.80) * TAILLE_CASE, (self.cy + 0.20) * TAILLE_CASE, (self.cx + 0.80) * TAILLE_CASE, (self.cy + 0.80) * TAILLE_CASE, (self.cx + 0.20) * TAILLE_CASE, (self.cy + 0.80) * TAILLE_CASE]), COULEURS[self.type_actif])
 
-			if symbol in (pyglet.window.key.DOWN, pyglet.window.key.UP, pyglet.window.key.LEFT, pyglet.window.key.RIGHT) :
-				pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [self.cx * TAILLE_CASE, self.cy * TAILLE_CASE, (self.cx + 1) * TAILLE_CASE, self.cy * TAILLE_CASE, (self.cx + 1) * TAILLE_CASE, (self.cy + 1) * TAILLE_CASE, self.cx * TAILLE_CASE, (self.cy + 1) * TAILLE_CASE]), ('c4B', (255, 0, 0, 0)*4))
 
 	def afficher(self) :
 		"""Afficher la carte selon le code couleurs définit au début."""
@@ -149,6 +190,8 @@ class Carte :
 			for j in range(self.nb_colonnes) :
 				pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [j * TAILLE_CASE, (self.nb_lignes - i) * TAILLE_CASE, (j + 1) * TAILLE_CASE, (self.nb_lignes - i) * TAILLE_CASE, (j + 1) * TAILLE_CASE, ((self.nb_lignes - i) - 1) * TAILLE_CASE, j * TAILLE_CASE, ((self.nb_lignes - i) - 1) * TAILLE_CASE]), COULEURS[self.carte[i][j]])
 
+
+#Exécution du programme
 if __name__ == "__main__" :
 
 	carte = Carte("defaut")
