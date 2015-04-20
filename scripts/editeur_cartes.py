@@ -1,6 +1,6 @@
 import pyglet
 
-TAILLE_CASE = 30 
+TAILLE_CASE = 15 
 
 PLAINE = 0
 FORET = 1
@@ -26,7 +26,7 @@ COULEUR_EAU = ('c4B', (0,0,255,0)*4)					# BLEU
 COULEUR_CHATEAU = ('c4B', (150,150,150,0)*4)				# GRIS CAIR
 COULEUR_SENTIER = ('c4B', (10,200,0,0)*4)				# VERT MARRON
 COULEUR_PONT = ('c4B', (100,50,0,0)*2 + (200,100,0,0)*2)		# DEGRADE DE MARRON
-COULEUR_SABLE = ('c4B', (200,200,0,0)*4)				# JAUNE
+COULEUR_SABLE = ('c4B', (255,255,0,0)*4)				# JAUNE
 COULEUR_MONTAGNE = ('c4B', (50,10,0,0)*4)				# MARRON FONCE
 COULEUR_MOB = ('c4B', (255,255,0,0)*2 + (200,70,0,0)*2)			# DEGRADE JAUNE - ORANGE
 COULEUR_BOSS = ('c4B', (200,200,0,0)*2 + (255,0,0,0)*2)			# DEGRADE ORANGE - ROUGE
@@ -78,7 +78,7 @@ class Carte :
 		"""Essaye d'ouvrir la carte carte_nom.txt (où nom est une chaîne de caractères contenue dans l'argument carte) dans le dossier cartes. Si un mauvais nom est donné ou que la carte n'éxiste pas, on crée une nouvelle carte."""
 
 		try :
-			with open("../cartes/carte_" + carte + ".txt", "r") as fichier_carte :
+			with open("./cartes/carte_" + carte + ".txt", "r") as fichier_carte :
 				self.charger_carte(fichier_carte)
 				self.nom = carte
 
@@ -114,7 +114,9 @@ class Carte :
 		fichier = fichier_carte.read().split("\n") 
 		for i in range(len(fichier)) :
 			self.carte.append([int(a) for a in fichier[i].split() if a != ''])
-		del(self.carte[len(self.carte) - 1])
+		del(self.carte[len(self.carte) -1])
+		if self.carte[len(self.carte) - 1] == []:
+			del(self.carte[len(self.carte) - 1])
 		
 		self.nb_lignes = len(self.carte)
 		self.nb_colonnes = len(self.carte[0])
@@ -149,6 +151,6 @@ class Carte :
 
 if __name__ == "__main__" :
 
-	carte = Carte("test")
+	carte = Carte("defaut")
 
 	pyglet.app.run()
