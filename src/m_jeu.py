@@ -12,7 +12,7 @@ import time
 import os
 
 try :
-	import pygletqsd
+	import pyglet
 except ImportError : 
 	import pyglet_py3 as pyglet
 	print("Bibliothèque pyglet non trouvée pour python3, utilisation de la version de pyglet du dossier src/ (",pyglet.version,").") 
