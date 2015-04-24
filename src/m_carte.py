@@ -8,17 +8,22 @@
 
 #-*-coding:utf-8-*-
 
+#Importation des modules fournis avec python :
+import os
+
+#Importation du module contenant les constantes :
+import constantes as cs
+
 class Carte :
 	"""Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
 	def __init__(self, carte_type = "defaut", num_sauv = None) : 
-		"""carte_type : Nom de la carte
-		num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la savegarde à charger.
-		
-		Charge la carte dans une liste de liste (carte) et définit la position par défaut du joueur (posx et posy).
+		"""Constructeur : Charge la carte dans une liste de liste (attribut carte) et définit la position par défaut du joueur (attributs posx et posy).
+			carte_type : Nom de la carte
+			num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la savegarde à charger.
 		"""
 
-		#Initialisation de la position du joueur. 
+		#Initialisation de la position du joueur :
 		self._posx = 0
 		self._posy = 0
 
@@ -34,24 +39,26 @@ class Carte :
 #			self.posx = self.carte[-1][0]
 #			self.posy = self.carte[-1][1]
 
-	#Encapsulation pour l'absisse du joueur (posx).
+	#Encapsulation pour l'absisse du joueur (posx) :
 	def _get_posx(self) :
 		"""Accesseur de l'attribut posx"""
 		return self._posx
 	def _set_posx(self, new_posx) :
-		"""Mutateur de l'attribut posx. Si la nouvelle valeur est sur la carte, alors elle est attribuée à l'attribut."""
+		"""Mutateur de l'attribut posx. Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (montagne), alors elle est attribuée à l'attribut."""
 		if new_posx >= 0 and new_posx < len(self.carte[0]) :
-			self._posx = new_posx
+			if self.carte[self.posy][new_posx] != cs.MONTAGNE :
+				self._posx = new_posx
 	posx = property(_get_posx, _set_posx)
 
-	#Encapsulation pour l'ordonnée du joueur (posy).
+	#Encapsulation pour l'ordonnée du joueur (posy) :
 	def _get_posy(self) :
 		"""Accesseur de l'attribut posy"""
 		return self._posy
 	def _set_posy(self, new_posy) :
 		"""Mutateur de l'attribut posy. Si la nouvelle valeur est sur la carte, alors elle est attribuée à l'attribut."""
 		if new_posy >= 0 and new_posy < len(self.carte) :
-			self._posy = new_posy
+			if self.carte[new_posy][self.posx] != cs.MONTAGNE :
+				self._posy = new_posy
 	posy = property(_get_posy, _set_posy)
 
 	def ouvrir_fichier_carte(self, dossier, nom_fichier) :
@@ -59,7 +66,7 @@ class Carte :
 		Une erreur est levée si un type autre que chaîne de caractères est donné ou si le dossier ou le fichier n'existe pas"""
 
 		try:
-			with open(dossier + "/" + nom_fichier + ".txt", 'r') as fichier_carte :
+			with open(os.path.join(dossier, nom_fichier + ".txt"), 'r') as fichier_carte :
 				self.charger_carte(fichier_carte)
 
 		except TypeError :
@@ -71,15 +78,15 @@ class Carte :
 	def charger_carte(self, fichier_carte) :
 		"""Charge le contenu d'un fichier carte dans une liste de liste de int."""
 
-		#On initialise la liste carte.
+		#On initialise la liste carte :
 		self.carte = []
 
-		#On récupère les lignes sous forme de chaîne de caractères rangés dans une liste.
+		#On récupère les lignes sous forme de chaîne de caractères rangés dans une liste :
 		fichier = fichier_carte.read().split("\n")
-		#On récupère les entiers séparés par des espaces dans chaque élément de la liste.
+		#On récupère les entiers séparés par des espaces dans chaque élément de la liste :
 		for i in range(len(fichier) - 1) :
 			self.carte.append([int(a) for a in fichier[i].split() if a != ''])
-		#On enlève la dernière ligne créée inutilement si un retour à une ligne vide a été fait à la fin du fichier carte.
+		#On enlève la dernière ligne créée inutilement si un retour à une ligne vide a été fait à la fin du fichier carte :
 		if self.carte[-1] == []:
 			del(self.carte[len(self.carte) - 1])
 
@@ -97,18 +104,18 @@ class Carte :
 #		return infos
 
 	def trouver_depart(self) :
-		"""Touve le départ (numéro 98) et le range dans posx et posy."""
+		"""Touve les coordonnées du départ (numéro 98) et les range dans posx et posy."""
 
-		#Initialisation des variables.
+		#Initialisation des variables :
 		i, j = 0, 0
 		found = False
 
-		#Boucle des ordonnées.
+		#Boucle des ordonnées :
 		while not found and j < len(self.carte) :
 			i = 0
-			#Boucle des absisses.
+			#Boucle des absisses :
 			while not found and i < len(self.carte) :
-				if self.carte[j][i] == 98 :
+				if self.carte[j][i] == cs.DEBUT :
 					self.posx, self.posy = i, j
 					found = True
 				i += 1
