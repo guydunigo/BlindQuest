@@ -17,7 +17,7 @@ SENTIER		= 5
 PONT		= 6
 SABLE		= 7
 MONTAGNE	= 8
-MOB		= 10
+MONSTRE		= 10
 BOSS		= 11
 BOSS_FINAL	= 12
 BONUS		= 13
@@ -36,7 +36,7 @@ CONV = {
 	PONT		: "pont",
 	SABLE		: "sable",
 	MONTAGNE	: "montagne",
-	MOB		: "mob",
+	MONSTRE		: "monstre",
 	BOSS		: "boss",
 	BOSS_FINAL	: "boss_final",
 	BONUS		: "bonus",
@@ -67,7 +67,7 @@ COMBAT		= "combat"
 #Dictionnaire décrivant les différents types de cases démarrant un combat ainsi que les caractéristiques de l'attaquant sous la forme (vie, dégats)
 
 COMBAT = {
-	MOB		: (1, 1),
+	MONSTRE		: (1, 1),
 	BOSS		: (2, 2),
 	BOSS_FINAL	: (3, 3)
 }

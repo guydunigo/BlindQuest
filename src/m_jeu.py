@@ -48,7 +48,11 @@ class Jeu :
 		self.init_events()
 
 		#Initialisation de la vie du personnage
-		self.vie = 3 #A changer
+		self.vie = 10 #A changer
+
+		#Initialisation du booléen de fin de jeu :
+		self.ENDSIG = False
+
 
 	def charger_sons(self) :
 		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'etension '.wav'. """
@@ -73,6 +77,7 @@ class Jeu :
 			print("Le dossier 'sons' contenant les sons (héhé) n'a pas été trouvé.")
 			self.sons = None
 
+
 	def creer_lecteurs(self) :
 		"""Crée les lecteurs pyglet, les lecteurs env, eau, et heartbeat sont réglés pour tourner en boucle sur la musique en cours : 
 			- env : Pour l'environnement.
@@ -83,73 +88,108 @@ class Jeu :
 		"""
 		
 		self.lecteurs = {}
-		for type in ("env", "eau", "monstre", "action", "heartbeat"):
+		for type in ("env", "monstre", "action", "heartbeat"):
 			self.lecteurs[type] = pyglet.media.Player()
-			if type in ("env", "eau", "heartbeat") :
+			if type == "env" :
+				#En boucle
 				self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
-			if type in ("eau", "heartbeat") :
+			if type == "heartbeat" :
+				self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
 				self.lecteurs[type].queue(self.sons[type])
-				self.lecteurs.volume = 0.1
+				self.lecteurs[type].volume = 0.1
+
+		#Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
+		for type in cs.PROX :
+			self.lecteurs[type] = pyglet.media.Player()
+			self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
+			self.lecteurs[type].queue(self.sons[cs.CONV[type]])
+			self.lecteurs[type].volume = 0.1
+
+		#On restitue l'environnement sonore de départ.
+		self.move()
+		self.lecteurs["env"].play()
+
  
 	def creer_fenetre(self) :
 		"""Crée la fenêtre pyglet en plein écran."""
 		self.window = pyglet.window.Window(fullscreen = True)
 
+
 	def init_events(self) :
 		"""crée les évenements : 
 	- claviers : 
 		- flèches directionnelles : se déplacer
-		- F : plein écran
-		- H : aide
+		- ECHAP : Quitter
+		- F : Plein écran
+		- H : Aide
 		- ..."""
 		@self.window.event
 		def on_key_press(symbol, modifiers):
-			#Fullscreen
-			if symbol == pyglet.window.key.F :
-				self.window.set_fullscreen(not self.window.fullscreen)
-			#Aide
-			elif symbol == pyglet.window.key.H :
-				self.afficher_aide()
-			#déplacements
-			elif symbol == pyglet.window.ket.UP :
-				self.move("NORD")
-			elif symbol == pyglet.window.ket.DOWN :
-				self.move("SUD")
-			elif symbol == pyglet.window.ket.RIGHT :
-				self.move("EST")
-			elif symbol == pyglet.window.ket.LEFT :
-				self.move("OUEST")
-				
+			if not self.ENDSIG :
+				#Fullscreen
+				if symbol == pyglet.window.key.F :
+					self.window.set_fullscreen(not self.window.fullscreen)
+				#Aide
+				elif symbol == pyglet.window.key.H :
+					self.afficher_aide()
+				#déplacements
+				elif symbol == pyglet.window.key.UP :
+					self.move("NORD")
+				elif symbol == pyglet.window.key.DOWN :
+					self.move("SUD")
+				elif symbol == pyglet.window.key.RIGHT :
+					self.move("EST")
+				elif symbol == pyglet.window.key.LEFT :
+					self.move("OUEST")
+
+		@self.window.event
 		def on_draw():
+			"""On efface l'écran, peut-être sera-t-il impossible de voir l'aide : dans ce cas, l'enlever et regarder quand la touche est relachée."""
 			self.window.clear()
-	
-	def move(self, direction) :
-		"""Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...).
-			- direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD")."""
-		
+
+
+	def move(self, direction = None) :
+		"""Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
+			- direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD"). 
+					Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+
 		#On déplace le joueur su la carte et on récupère le code de la case d'arrivée. 
 		case = self.carte.move(direction)
 		#On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
-		infos_prox = case / 100
+		infos_prox = int(case / 100)
 		case = case - infos_prox
+
 		print(case , infos_prox)
+		#Restitution de l'environnement actuel :
 		
-		
-		if infos_prox & PROX_EAU == PROX_EAU :
-			eau.play()
+		print(self.lecteurs["env"].source, '\n')
+		#Si la source est déjà active, on la remet au début.
+		if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
+			self.lecteurs["env"].seek(0)
 		else :
-			eau.pause()
-			
+			self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
+			if not self.lecteurs["env"].playing :
+				self.lecteurs["env"].next()
+
+		#Détection des proximités et restitution du son associé :
+		for prox in cs.PROX :
+			if infos_prox & cs.PROX[prox] == cs.PROX[prox] :
+				self.lecteurs[prox].play()
+			else :
+				self.lecteurs[prox].pause()
+
+
 	def afficher_aide(self) :
 		"""Fonction qui affiche l'aide (tiens, tiens...)."""
 		pass
 
+
 	def fin(self, type) :
-		"""Fonction qui gère la fin selon s'il y a victoire ou mort.
+		"""Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
 			- type : chaîne de caractère décrivant la fin parmis celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
 		self.lecteurs["env"].queue(type)
-		
+		#
 
 	def run(self) :
 	  

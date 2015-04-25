@@ -147,9 +147,10 @@ class Carte :
 			raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
 
 
-	def move(self, direction) :
+	def move(self, direction = None) :
 		"""Fonction qui déplace le joueur et renvoie le code de la case d'arrivée du joueur.
-			- direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD")."""
+			- direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD").
+					Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
 
 		if direction == "NORD" :
 			self.posy -= 1
@@ -161,7 +162,7 @@ class Carte :
 			self.posx += 1
 
 		#On renvoie le code de la case ainsi que, à partir des centaines, le code de proximité :
-		return self.catre[self.posy][self.posx] + detect_prox() * 100
+		return self.carte[self.posy][self.posx] + self.detect_prox() * 100
 
       
 	def detect_prox(self) :
