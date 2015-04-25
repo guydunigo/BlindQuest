@@ -6,9 +6,10 @@
 #                               #
 # # # # # # # # # # # # # # # # #
 
+import constantes
 import m_jeu
 
-jeu = m_jeu.Jeu("petite")
+jeu = m_jeu.Jeu(constantes.CARTE)
 
 jeu.run()
 
