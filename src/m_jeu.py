@@ -27,7 +27,7 @@ import m_carte as mc
 class Jeu :
 	"""Classe qui gère le jeu, la Bibliothèque pyglet, les évènements claviers, la fenêtre et le son."""
 
-	def __init__(self, carte_type = "defaut") :
+	def __init__(self, type_carte = "defaut") :
 		"""Constructeur : 
 			carte_type : type de carte à utiliser durant le jeu. (carte nommée selon l'exemple : carte_NOM.txt et placée dans le dossier cartes)"""
 
@@ -37,7 +37,7 @@ class Jeu :
 		pyglet.resource.reindex()
 
 		#Chargement de la carte.
-		self.carte = mc.Carte(carte_type)
+		self.carte = mc.Carte(type_carte)
 		#Chargement des sons
 		self.charger_sons()
 		#Lecteurs (environnement(s), action(s), heartbeats,...)
@@ -50,8 +50,9 @@ class Jeu :
 		#Initialisation de la vie du personnage
 		self.vie = 10 #A changer
 
-		#Initialisation du booléen de fin de jeu :
+		#Initialisation des booléens de fin de jeu et de combat :
 		self.ENDSIG = False
+		self.isCombat = False
 
 
 	def charger_sons(self) :
@@ -71,7 +72,7 @@ class Jeu :
 
 			#On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'etension '.wav' :
 			for son in liste_sons :
-				self.sons[son.replace(".wav",'')] = pyglet.resource.media(os.path.join("sons", son))
+				self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son))
 
 		except FileNotFoundError :
 			print("Le dossier 'sons' contenant les sons (héhé) n'a pas été trouvé.")
@@ -88,26 +89,27 @@ class Jeu :
 		"""
 		
 		self.lecteurs = {}
-		for type in ("env", "monstre", "action", "heartbeat"):
-			self.lecteurs[type] = pyglet.media.Player()
-			if type == "env" :
+		for lecteur in ("env", "monstre", "action", "heartbeat"):
+			self.lecteurs[lecteur] = pyglet.media.Player()
+			if lecteur == "env" :
 				#En boucle
-				self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
-			if type == "heartbeat" :
-				self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
-				self.lecteurs[type].queue(self.sons[type])
-				self.lecteurs[type].volume = 0.1
+				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+			if lecteur == "heartbeat" :
+				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+				self.lecteurs[lecteur].queue(self.sons[lecteur])
+				self.lecteurs[lecteur].volume = 0.1
 
 		#Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
-		for type in cs.PROX :
-			self.lecteurs[type] = pyglet.media.Player()
-			self.lecteurs[type].eos_action = self.lecteurs[type].EOS_LOOP
-			self.lecteurs[type].queue(self.sons[cs.CONV[type]])
-			self.lecteurs[type].volume = 0.1
+		for lecteur in cs.PROX :
+			self.lecteurs[lecteur] = pyglet.media.Player()
+			self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+			self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
+			self.lecteurs[lecteur].volume = 0.1
 
 		#On restitue l'environnement sonore de départ.
-		self.move()
+		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
 		self.lecteurs["env"].play()
+		self.move()
 
  
 	def creer_fenetre(self) :
@@ -157,19 +159,18 @@ class Jeu :
 		case = self.carte.move(direction)
 		#On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
 		infos_prox = int(case / 100)
-		case = case - infos_prox
+		case = case - infos_prox * 100
 
 		print(case , infos_prox)
 		#Restitution de l'environnement actuel :
-		
-		print(self.lecteurs["env"].source, '\n')
+		print("Playing : {} : {}".format(cs.CONV[case], self.sons[cs.CONV[case]]))
+		print("Source : ", self.lecteurs["env"].source, '\n')
 		#Si la source est déjà active, on la remet au début.
 		if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
 			self.lecteurs["env"].seek(0)
 		else :
 			self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
-			if not self.lecteurs["env"].playing :
-				self.lecteurs["env"].next()
+			self.lecteurs["env"].next_source()
 
 		#Détection des proximités et restitution du son associé :
 		for prox in cs.PROX :
@@ -184,11 +185,11 @@ class Jeu :
 		pass
 
 
-	def fin(self, type) :
+	def fin(self, type_fin) :
 		"""Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
 			- type : chaîne de caractère décrivant la fin parmis celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
-		self.lecteurs["env"].queue(type)
+		self.lecteurs["env"].queue(type_fin)
 		#
 
 	def run(self) :

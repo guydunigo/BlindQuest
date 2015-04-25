@@ -17,7 +17,7 @@ import constantes as cs
 class Carte :
 	"""Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
-	def __init__(self, carte_type = "defaut", num_sauv = None) : 
+	def __init__(self, type_carte = "defaut", num_sauv = None) : 
 		"""Constructeur : Charge la carte dans une liste de liste (attribut carte) et définit la position par défaut du joueur (attributs posx et posy).
 			carte_type : Nom de la carte
 			num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la savegarde à charger.
@@ -30,7 +30,7 @@ class Carte :
 		#Si on n'a pas de valeur donnée pour num_sauv (le numéro de la sauvegarde), on ouvre une carte nommée carte_NOM.txt dans le dossier cartes et on recherche le départ (codé 98).
 		if num_sauv == None :
 
-			self.ouvrir_fichier_carte("cartes", "carte_" + str(carte_type))
+			self.ouvrir_fichier_carte("cartes", "carte_" + str(type_carte))
 			self.trouver_depart()
 
 		#Pour plus tard lors du chargement de sauvegardes. 
