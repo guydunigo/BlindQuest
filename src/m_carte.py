@@ -12,7 +12,7 @@
 import os
 
 #Importation du module contenant les constantes :
-import src.constantes as cs
+import constantes as cs
 
 class Carte :
 	"""Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
@@ -39,6 +39,7 @@ class Carte :
 #			self.posx = self.carte[-1][0]
 #			self.posy = self.carte[-1][1]
 
+
 	#Encapsulation pour l'absisse du joueur (posx) :
 	def _get_posx(self) :
 		"""Accesseur de l'attribut posx"""
@@ -50,6 +51,7 @@ class Carte :
 				self._posx = new_posx
 	posx = property(_get_posx, _set_posx)
 
+
 	#Encapsulation pour l'ordonnée du joueur (posy) :
 	def _get_posy(self) :
 		"""Accesseur de l'attribut posy"""
@@ -60,6 +62,7 @@ class Carte :
 			if self.carte[new_posy][self.posx] not in cs.NOGO :
 				self._posy = new_posy
 	posy = property(_get_posy, _set_posy)
+
 
 	def ouvrir_fichier_carte(self, dossier, nom_fichier) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
@@ -74,6 +77,7 @@ class Carte :
 
 		except FileNotFoundError :
 			raise FileNotFoundError("Il n'existe pas de fichier carte nommé {} dans le dossier '{}', utilisation de la carte par défaut.".format(nom_fichier + ".txt", dossier))
+
 
 	def charger_carte(self, fichier_carte) :
 		"""Charge le contenu d'un fichier carte dans une liste de liste de int, si les lignes ne sont pas toutes de la même taille, on les complète par de l'eau."""
@@ -104,6 +108,7 @@ class Carte :
 			while len(liste) < self.nb_colonnes :
 				liste.append(cs.EAU)
 
+
 #	def get_player_infos():
 #		"""Lors du cahrgement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme ['#', posx, posy, vie, bonus...].
 #		Cette méthode renvoie cette liste sans les information concernant la position du joueur."""
@@ -116,6 +121,7 @@ class Carte :
 #		del self.carte[-1]
 		
 #		return infos
+
 
 	def trouver_depart(self) :
 		"""Touve les coordonnées du départ et les range dans posx et posy."""
@@ -136,6 +142,7 @@ class Carte :
 			j += 1
 
 		#Si la valeur de départ n'est pas trouvée, on lève une erreur de valeur (ça paraît logique) : 
+		#Plus sérieusement, le type d'erreur levée pourra être changée.
 		if not found :
 			raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
 
@@ -155,28 +162,29 @@ class Carte :
 
 		#On renvoie le code de la case ainsi que, à partir des centaines, le code de proximité :
 		return self.catre[self.posy][self.posx] + detect_prox() * 100
-	      
+
+      
 	def detect_prox(self) :
 		"""Renvoie un entier composé au maximum de 4 puissances de 2 différentes aditionnées pour l'utilisation de l'opérateur bit à bit."""
 		#Initialisation de la variable qui sera retournée :
 		detect = 0
 		#On regarde si les différents types qui doivent être détectés sont à proximité : 
-		for type in cs.PROX :
+		for prox in cs.PROX :
 			#NORD :
 			if self.posy > 0 :
-				if self.carte[self.posy - 1][self.posx] == cs.PROX[type] :
-					detect |= cs.PROX[type]
+				if self.carte[self.posy - 1][self.posx] == prox :
+					detect |= cs.PROX[prox]
 			#SUD :
-			if self.posy < self.nb_lignes :
-				if self.carte[self.posy + 1][self.posx] == cs.PROX[type] :
-					detect |= cs.PROX[type]
+			if self.posy < self.nb_lignes -  1 :
+				if self.carte[self.posy + 1][self.posx] == prox :
+					detect |= cs.PROX[prox]
 			#OUEST :
 			if self.posx > 0 :
-				if self.carte[self.posy][self.posx - 1] == cs.PROX[type] :
-					detect |= cs.PROX[type]
+				if self.carte[self.posy][self.posx - 1] == prox :
+					detect |= cs.PROX[prox]
 			#EST :
-			if self.posx < self.nb_colonnes :
-				if self.carte[self.posy][self.posx + 1] == cs.PROX[type] :
-					detect |= cs.PROX[type]
+			if self.posx < self.nb_colonnes - 1 :
+				if self.carte[self.posy][self.posx + 1] == prox :
+					detect |= cs.PROX[prox]
 
 		return detect

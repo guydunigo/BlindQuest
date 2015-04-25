@@ -104,10 +104,13 @@ class Jeu :
 		- ..."""
 		@self.window.event
 		def on_key_press(symbol, modifiers):
+			#Fullscreen
 			if symbol == pyglet.window.key.F :
 				self.window.set_fullscreen(not self.window.fullscreen)
+			#Aide
 			elif symbol == pyglet.window.key.H :
 				self.afficher_aide()
+			#déplacements
 			elif symbol == pyglet.window.ket.UP :
 				self.move("NORD")
 			elif symbol == pyglet.window.ket.DOWN :
