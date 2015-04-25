@@ -35,6 +35,8 @@ class Jeu :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
 		pyglet.resource.reindex()
+		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marche pas)
+		pyglet.options['audio'] = ('openal',)
 
 		#Chargement de la carte.
 		self.carte = mc.Carte(type_carte)
@@ -56,11 +58,9 @@ class Jeu :
 
 
 	def charger_sons(self) :
-		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'etension '.wav'. """
-	  
-		#Peut-être charger les sons automatiquement avec os.listdir() et charger tous les sons au format wav du répertoire 'sons' : ("Un peu" BOURIN et peut-être bouffe-mémoire)
-		#Pour les sons courts, peut-être : "sound = pyglet.resource.media('shot.wav', streaming=False)", prends plus de mémoire mais accès plus rapide.
-		
+		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'etension '.wav'.
+		On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de source déjà queued. ("Un peu" BOURIN et peut-être bouffe-mémoire)"""
+
 		#On crée le dictionnaire de sons :
 		self.sons = {}
 		try :
@@ -72,7 +72,7 @@ class Jeu :
 
 			#On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'etension '.wav' :
 			for son in liste_sons :
-				self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son))
+				self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son), streaming = False)
 
 		except FileNotFoundError :
 			print("Le dossier 'sons' contenant les sons (héhé) n'a pas été trouvé.")
@@ -81,11 +81,11 @@ class Jeu :
 
 	def creer_lecteurs(self) :
 		"""Crée les lecteurs pyglet, les lecteurs env, eau, et heartbeat sont réglés pour tourner en boucle sur la musique en cours : 
-			- env : Pour l'environnement.
-			- eau : Pour l'eau à proximité de la case.
-			- action : Pour les différentes actions (déplacements, coups,...).
-			- monstre : Bruit du monstre qui indique que l'on est sur la case d'un monstre.
-			- heartbeat : Si il ne reste qu'une vie, on entend un bâttement de coeur.
+			- env : Pour l'environnement, en boucle.
+			- action : Pour les différentes actions (déplacements, coups,...). : peut-être inutile (directement son.play()).
+			- monstre : Bruit du monstre qui indique que l'on est sur la case d'un monstre.: peut-être inutile
+			- heartbeat : Si il ne reste qu'une vie, on entend un bâttement de coeur, en boucle.
+			- Les différents sons de proximité ont leur propre lecteur.
 		"""
 		
 		self.lecteurs = {}
@@ -97,14 +97,14 @@ class Jeu :
 			if lecteur == "heartbeat" :
 				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 				self.lecteurs[lecteur].queue(self.sons[lecteur])
-				self.lecteurs[lecteur].volume = 0.1
+				self.lecteurs[lecteur].volume = 0.05
 
 		#Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
 		for lecteur in cs.PROX :
 			self.lecteurs[lecteur] = pyglet.media.Player()
 			self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 			self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-			self.lecteurs[lecteur].volume = 0.1
+			self.lecteurs[lecteur].volume = 0.05
 
 		#On restitue l'environnement sonore de départ.
 		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
@@ -161,10 +161,8 @@ class Jeu :
 		infos_prox = int(case / 100)
 		case = case - infos_prox * 100
 
-		print(case , infos_prox)
+		print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
 		#Restitution de l'environnement actuel :
-		print("Playing : {} : {}".format(cs.CONV[case], self.sons[cs.CONV[case]]))
-		print("Source : ", self.lecteurs["env"].source, '\n')
 		#Si la source est déjà active, on la remet au début.
 		if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
 			self.lecteurs["env"].seek(0)
