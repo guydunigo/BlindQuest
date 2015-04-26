@@ -1,3 +1,5 @@
+#-*-coding:utf-8-*-
+
 # # # # # # # # # # # # # # # # #
 #				#
 #         Projet de MDD         #
@@ -5,8 +7,6 @@
 #       fichier : m_jeu.py      #
 #                               #
 # # # # # # # # # # # # # # # # #
-
-#-*-coding:utf-8-*-
 
 #Importation des modules fournis avec python :
 import time
@@ -33,6 +33,7 @@ class Jeu :
 
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
+		print(working_dir)
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
 		pyglet.resource.reindex()
 		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marche pas)

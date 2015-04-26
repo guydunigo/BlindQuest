@@ -1,3 +1,5 @@
+#-*-coding:utf-8-*-
+
 # # # # # # # # # # # # # # # # #
 #				#
 #	  Projet de MDD		#
@@ -5,8 +7,6 @@
 #     fichier : m_carte.py	#
 #				#
 # # # # # # # # # # # # # # # # #
-
-#-*-coding:utf-8-*-
 
 #Importation des modules fournis avec python :
 import os
