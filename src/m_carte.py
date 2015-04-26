@@ -14,7 +14,7 @@ import os
 #Importation du module contenant les constantes :
 import constantes as cs
 
-class Carte :
+class Carte (object) :
 	"""Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
 	def __init__(self, type_carte = "defaut", num_sauv = None) : 
@@ -46,7 +46,7 @@ class Carte :
 		return self._posx
 	def _set_posx(self, new_posx) :
 		"""Mutateur de l'attribut posx. Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut."""
-		if new_posx >= 0 and new_posx < len(self.carte[0]) :
+		if new_posx >= 0 and new_posx < self.nb_colonnes :
 			if self.carte[self.posy][new_posx] not in cs.NOGO :
 				self._posx = new_posx
 	posx = property(_get_posx, _set_posx)
@@ -58,7 +58,7 @@ class Carte :
 		return self._posy
 	def _set_posy(self, new_posy) :
 		"""Mutateur de l'attribut posy. Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut."""
-		if new_posy >= 0 and new_posy < len(self.carte) :
+		if new_posy >= 0 and new_posy < self.nb_lignes :
 			if self.carte[new_posy][self.posx] not in cs.NOGO :
 				self._posy = new_posy
 	posy = property(_get_posy, _set_posy)

@@ -24,7 +24,7 @@ import constantes as cs
 #Importation de notre module qui gère la carte et la position du joueur :
 import m_carte as mc
 
-class Jeu :
+class Jeu (object) :
 	"""Classe qui gère le jeu, la Bibliothèque pyglet, les évènements claviers, la fenêtre et le son."""
 
 	def __init__(self, type_carte = "defaut") :
@@ -33,7 +33,6 @@ class Jeu :
 
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
-		print(working_dir)
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
 		pyglet.resource.reindex()
 		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marche pas)

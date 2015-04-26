@@ -12,6 +12,8 @@
 	4 : Chateau
 	5 : sentier de la forêt
 	6 : Pont
+	7 : Sable
+	8 : Montagne
 	10: mob
 	11: Boss #on ne l'utilisera pas au début
 	12: Boss Final

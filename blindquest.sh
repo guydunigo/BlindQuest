@@ -1,9 +1,12 @@
 #!/bin/bash
 
 case $1 in
-	"")
+	""|-3|--python3)
 		python3 ./src/main.py
-	;; 
+	;;
+	-2|--python2)
+		python2 ./src/main.py
+	;;
 	--install|-i)
 		echo "[Desktop Entry]
 Comment[fr]=
@@ -30,9 +33,11 @@ Type=Application" > blindquest.desktop
 Un jeu d'aventure exclusivement basé sur du son
 
 COMMANDE :
-	./blindquest.sh [-i|-m|--install|--map-editor]
+	./blindquest.sh [-2|-3|-i|-m|--python2|--python3|--install|--map-editor]
 
-OPTIONS : 
+OPTIONS :
+	--python2	-2	Utilise python2 pour exécuter le jeu.
+	--python3	-3	Utilise python3 (par défaut) pour exécuter le jeu.
  	--install	-i	Crée un fichier .desktop du jeu.
 	--map-editor	-m	Ouvre l'éditeur de carte.
 	--help		-h	Affiche l'aide.
