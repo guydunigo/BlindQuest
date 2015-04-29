@@ -142,8 +142,9 @@ class Carte (object) :
 			j += 1
 
 		#Si la valeur de départ n'est pas trouvée, on lève une erreur de valeur (ça paraît logique) : 
-		#Plus sérieusement, le type d'erreur levée pourra être changée.
+		#Plus sérieusement, le type d'erreur levée pourra être changé.
 		if not found :
+			print(self.carte)
 			raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
 
 
@@ -151,6 +152,9 @@ class Carte (object) :
 		"""Fonction qui déplace le joueur et renvoie le code de la case d'arrivée du joueur.
 			- direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD").
 					Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+
+		#On copie les coordonnées du joueur avant le déplacement :
+		x, y = self.posx, self.posy
 
 		if direction == "NORD" :
 			self.posy -= 1
@@ -161,6 +165,10 @@ class Carte (object) :
 		elif direction == "EST" :
 			self.posx += 1
 
+		#Si le joueur n'a pas bougé, on renvoie None :
+		if x == self.posx and y == self.posy :
+			return None
+		
 		#On renvoie le code de la case ainsi que, à partir des centaines, le code de proximité :
 		return self.carte[self.posy][self.posx] + self.detect_prox() * 100
 

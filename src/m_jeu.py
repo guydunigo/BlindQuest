@@ -14,8 +14,8 @@ import os
 
 #Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 try :
-	import pygletlkj
-except ImportError : 
+	import pyglet
+except ImportError :
 	import pyglet_py3 as pyglet
 	print("Bibliothèque pyglet non trouvée pour python3, utilisation de la version de pyglet du dossier src/ (",pyglet.version,").") 
 
@@ -55,9 +55,10 @@ class Jeu (object) :
 		#Initialisation de la vie du personnage
 		self.vie = 10 #A changer
 
-		#Initialisation des booléens de fin de jeu et de combat :
-		self.ENDSIG = False
+		#Initialisation des booléens de fin de jeu, de combat et de pause :
+		self.isEnd = False
 		self.isCombat = False
+		self.isPaused = False
 
 
 	def charger_sons(self) :
@@ -121,30 +122,50 @@ class Jeu (object) :
 
 	def init_events(self) :
 		"""crée les évenements : 
-			- claviers : 
-				- flèches directionnelles : se déplacer
-				- ECHAP : Quitter
-				- F : Plein écran
-				- H : Aide
-				- ..."""
+			- claviers :
+				- À tous moments :
+				  - ECHAP : Quitter
+				  - F : Plein écran
+				  - H : Aide
+				  - C : Charger une Sauvegarde
+				- Lors de pérégrinations diverses :
+				  - flèches directionnelles : se déplacer
+				  - S : Sauvegarder
+				- Lors d'un combat :
+				  - ..."""
+		
 		@self.window.event
 		def on_key_press(symbol, modifiers):
-			if not self.ENDSIG :
-				#Fullscreen
-				if symbol == pyglet.window.key.F :
-					self.window.set_fullscreen(not self.window.fullscreen)
-				#Aide
-				elif symbol == pyglet.window.key.H :
-					self.afficher_aide()
-				#déplacements
-				elif symbol == pyglet.window.key.UP :
-					self.move("NORD")
-				elif symbol == pyglet.window.key.DOWN :
-					self.move("SUD")
-				elif symbol == pyglet.window.key.RIGHT :
-					self.move("EST")
-				elif symbol == pyglet.window.key.LEFT :
-					self.move("OUEST")
+			#Fullscreen
+			if symbol == pyglet.window.key.F :
+				self.window.set_fullscreen(not self.window.fullscreen)
+			#Aide
+			elif symbol == pyglet.window.key.H :
+				self.afficher_aide()
+			#Pause
+			elif symbol == pyglet.window.key.P :
+				self.pause()
+			#Charger
+			elif symbol == pyglet.window.key.C :
+				self.load()
+
+			if not self.isEnd and not self.isPaused :
+				if not self.isCombat :
+					#Déplacements
+					if symbol == pyglet.window.key.UP :
+						self.move("NORD")
+					elif symbol == pyglet.window.key.DOWN :
+						self.move("SUD")
+					elif symbol == pyglet.window.key.RIGHT :
+						self.move("EST")
+					elif symbol == pyglet.window.key.LEFT :
+						self.move("OUEST")
+					#Sauvegarder
+					elif symbol == pyglet.window.key.S :
+						self.save()
+				else :
+					if symbol == pyglet.window.key.A : # À changer.
+						pass
 
 		@self.window.event
 		def on_draw():
@@ -159,25 +180,31 @@ class Jeu (object) :
 
 		#On déplace le joueur su la carte et on récupère le code de la case d'arrivée. 
 		case = self.carte.move(direction)
-		#On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
-		infos_prox = int(case / 100)
-		case = case - infos_prox * 100
+		if case != None :
+			#On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
+			infos_prox = int(case / 100)
+			case = case - infos_prox * 100
 
-		print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
-		#Restitution de l'environnement actuel :
-		#Si la source est déjà active, on la remet au début.
-		if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
-			self.lecteurs["env"].seek(0)
-		else :
-			self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
-			self.lecteurs["env"].next_source()
+			print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
 
-		#Détection des proximités et restitution du son associé :
-		for prox in cs.PROX :
-			if infos_prox & cs.PROX[prox] == cs.PROX[prox] :
-				self.lecteurs[prox].play()
+			#Si le joueur arrive sur une case létale, on active la fin. 
+			if case in cs.DANGER :
+				self.fin(cs.DANGER[case])
+			
+			#Restitution de l'environnement actuel :
+			#Si la source est déjà active, on la remet au début.
+			if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
+				self.lecteurs["env"].seek(0)
 			else :
-				self.lecteurs[prox].pause()
+				self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
+				self.lecteurs["env"].next_source()
+
+			#Détection des proximités et restitution du son associé :
+			for prox in cs.PROX :
+				if infos_prox & cs.PROX[prox] == cs.PROX[prox] :
+					self.lecteurs[prox].play()
+				else :
+					self.lecteurs[prox].pause()
 
 
 	def afficher_aide(self) :
@@ -189,11 +216,29 @@ class Jeu (object) :
 		"""Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
 			- type : chaîne de caractère décrivant la fin parmis celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
-		self.lecteurs["env"].queue(type_fin)
-		#
+		#On restitue le sons associé à la mort :
+		self.lecteurs["env"].queue(self.sons[type_fin])
+		self.lecteurs["env"].next_source()
+
+		#On active l'état fin qui empèche de se déplacer et de sauvegarder : :
+		self.isEnd = True
+
+
+	def pause(self) :
+		"""Cette méthode met en pause le jeu et les lecteurs."""
+		pass
+
+
+	def save(self) :
+		"""Sauvegarde la partie."""
+		pass
+
+
+	def load(self) :
+		"""Charge une partie."""
+		pass
+
 
 	def run(self) :
-	  
-		pyglet.app.run()
 
-	#Autres fonctions
+		pyglet.app.run()
