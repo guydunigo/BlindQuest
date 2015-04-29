@@ -1,5 +1,13 @@
 #-*-coding:utf-8-*-
 
+# # # # # # # # # # # # # # # # #
+#				#
+#	  Projet de MDD		#
+#				#
+#    fichier : constantes.py	#
+#				#
+# # # # # # # # # # # # # # # # #
+
 #Définition des constantes
 
 #Carte utilisée :

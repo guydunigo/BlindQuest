@@ -49,6 +49,7 @@ class Carte (object) :
 		if new_posx >= 0 and new_posx < self.nb_colonnes :
 			if self.carte[self.posy][new_posx] not in cs.NOGO :
 				self._posx = new_posx
+
 	posx = property(_get_posx, _set_posx)
 
 
