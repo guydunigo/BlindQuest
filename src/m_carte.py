@@ -36,8 +36,8 @@ class Carte (object) :
 		#Pour plus tard lors du chargement de sauvegardes. 
 #		else :
 #			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
-#			self.posx = self.carte[-1][0]
-#			self.posy = self.carte[-1][1]
+#			self.posx = self.carte[-1][1]
+#			self.posy = self.carte[-1][2]
 
 
 	#Encapsulation pour l'absisse du joueur (posx) :
@@ -109,8 +109,8 @@ class Carte (object) :
 				liste.append(cs.EAU)
 
 
-#	def get_player_infos():
-#		"""Lors du cahrgement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme ['#', posx, posy, vie, bonus...].
+#	def get_player_info(self):
+#		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme ['#', posx, posy, vie, bonus...].
 #		Cette méthode renvoie cette liste sans les information concernant la position du joueur."""
 
 #		#On récupère la dernière ligne. 
@@ -124,7 +124,7 @@ class Carte (object) :
 
 
 	def trouver_depart(self) :
-		"""Touve les coordonnées du départ et les range dans posx et posy."""
+		"""Trouve les coordonnées du départ et les range dans posx et posy."""
 
 		#Initialisation des variables :
 		i, j = 0, 0

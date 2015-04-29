@@ -14,7 +14,7 @@ import os
 
 #Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 try :
-	import pyglet
+	import pygletlkj
 except ImportError : 
 	import pyglet_py3 as pyglet
 	print("Bibliothèque pyglet non trouvée pour python3, utilisation de la version de pyglet du dossier src/ (",pyglet.version,").") 
@@ -31,6 +31,9 @@ class Jeu (object) :
 		"""Constructeur : 
 			carte_type : type de carte à utiliser durant le jeu. (carte nommée selon l'exemple : carte_NOM.txt et placée dans le dossier cartes)"""
 
+		#Si on se trouve dans le dossier src, on va dans le dossier principal.
+		if "/src" in os.getcwd()[-4:] :
+			os.chdir("../")
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
@@ -109,7 +112,6 @@ class Jeu (object) :
 		#On restitue l'environnement sonore de départ.
 		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
 		self.lecteurs["env"].play()
-		self.move()
 
  
 	def creer_fenetre(self) :
@@ -119,12 +121,12 @@ class Jeu (object) :
 
 	def init_events(self) :
 		"""crée les évenements : 
-	- claviers : 
-		- flèches directionnelles : se déplacer
-		- ECHAP : Quitter
-		- F : Plein écran
-		- H : Aide
-		- ..."""
+			- claviers : 
+				- flèches directionnelles : se déplacer
+				- ECHAP : Quitter
+				- F : Plein écran
+				- H : Aide
+				- ..."""
 		@self.window.event
 		def on_key_press(symbol, modifiers):
 			if not self.ENDSIG :
