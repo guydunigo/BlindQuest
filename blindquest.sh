@@ -3,7 +3,7 @@
 mkdir log 2> /dev/null
 
 case $1 in
-	""|-3|--python3)
+	""|-3|-3d|--python3)
 		echo "
 
 [$(date) on $OSTYPE]
@@ -11,7 +11,7 @@ case $1 in
 " >> log/errors_py3.log
 		python3 ./src_3/main.py 2>> log/errors_py3.log
 	;;
-	-2|--python2)
+	-2|-2d|--python2)
 		echo "
 
 [$(date) on $OSTYPE]
@@ -45,16 +45,27 @@ Type=Application" > blindquest.desktop
 Un jeu d'aventure exclusivement basé sur du son
 
 COMMANDE :
-	./blindquest.sh [-2|-3|-i|-m|--python2|--python3|--install|--map-editor]
+	./blindquest.sh [options]
 
 OPTIONS :
 	--python2	-2	Utilise python2 pour exécuter le jeu.
+			-2d	Utilise python2 et affiche le fichier d'erreurs à la fin.
 	--python3	-3	Utilise python3 (par défaut) pour exécuter le jeu.
+	-d -3d --debug 		Utilise python3 et affiche le fichier d'erreurs à la fin.
  	--install	-i	Crée un fichier .desktop du jeu.
 	--map-editor	-m	Ouvre l'éditeur de carte.
 	--help		-h	Affiche l'aide.
 "
 	;;
 	*)
+	;;
+esac
+
+case $1 in
+	-d|-3d|--debug)
+		cat log/errors_py3.log 
+	;;
+	-2d)
+		cat log/errors_py2.log
 	;;
 esac

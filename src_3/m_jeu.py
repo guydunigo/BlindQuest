@@ -13,11 +13,11 @@ import time
 import os
 
 #Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
-try :
-	import pyglet
-except ImportError :
-	import pyglet_py3 as pyglet
-	print("Bibliothèque pyglet non trouvée pour python3, utilisation de la version de pyglet du dossier src/ (",pyglet.version,").") 
+
+import pyglet
+print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").")
+print()
+print()
 
 #Importation des constantes :
 import constantes as cs
@@ -39,7 +39,7 @@ class Jeu (object) :
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
 		pyglet.resource.reindex()
 		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marche pas)
-		pyglet.options['audio'] = ('openal',)
+		#pyglet.options['audio'] = ('openal',)
 
 		#Chargement de la carte.
 		self.carte = mc.Carte(type_carte)
@@ -64,6 +64,9 @@ class Jeu (object) :
 	def charger_sons(self) :
 		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'etension '.wav'.
 		On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de source déjà queued. ("Un peu" BOURIN et peut-être bouffe-mémoire)"""
+
+		#On prévient que le temps de chargement est normal :
+		print("Chargement des sons en mémoire...")
 
 		#On crée le dictionnaire de sons :
 		self.sons = {}

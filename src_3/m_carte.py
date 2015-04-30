@@ -89,8 +89,12 @@ class Carte (object) :
 		#On récupère les lignes sous forme de chaîne de caractères rangés dans une liste :
 		fichier = fichier_carte.read().split("\n")
 		#On récupère les entiers séparés par des espaces dans chaque élément de la liste :
-		for i in range(len(fichier) - 1) :
-			self.carte.append([int(a) for a in fichier[i].split() if a != ''])
+		try :
+			for i in range(len(fichier) - 1) :
+				self.carte.append([int(a) for a in fichier[i].split() if a != ''])
+		except ValueError :
+			raise ValueError("Un caractère présent sur la carte n'est pas un nombre")
+
 		#On enlève la dernière ligne créée inutilement si un retour à une ligne vide a été fait à la fin du fichier carte :
 		if self.carte[-1] == []:
 			del(self.carte[-1])
