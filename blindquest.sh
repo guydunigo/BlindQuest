@@ -1,11 +1,23 @@
 #!/bin/bash
 
+mkdir log 2> /dev/null
+
 case $1 in
 	""|-3|--python3)
-		python3 ./src_3/main.py
+		echo "
+
+[$(date) on $OSTYPE]
+
+" >> log/errors_py3.log
+		python3 ./src_3/main.py 2>> log/errors_py3.log
 	;;
 	-2|--python2)
-		python2 ./src_2/main.py
+		echo "
+
+[$(date) on $OSTYPE]
+
+" >> log/errors_py2.log
+		python2 ./src_2/main.py 2>> log/errors_py2.log
 	;;
 	--install|-i)
 		echo "[Desktop Entry]

@@ -32,7 +32,7 @@ class Jeu (object) :
 			carte_type : type de carte à utiliser durant le jeu. (carte nommée selon l'exemple : carte_NOM.txt et placée dans le dossier cartes)"""
 
 		#Si on se trouve dans le dossier src, on va dans le dossier principal.
-		if "/src" in os.getcwd()[-4:] :
+		if "/src_2" in os.getcwd()[-4:] :
 			os.chdir("../")
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -182,7 +182,7 @@ class Jeu (object) :
 			infos_prox = int(case / 100)
 			case = case - infos_prox * 100
 
-			print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
+			print "code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox
 
 			#Si le joueur arrive sur une case létale, on active la fin. 
 			if case in cs.DANGER :
