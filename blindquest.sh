@@ -3,7 +3,7 @@
 mkdir log 2> /dev/null
 
 case $1 in
-	""|-3|-3d|--python3)
+	""|-3|-3d|--python3|-d|--debug)
 		echo "
 
 [$(date) on $OSTYPE]

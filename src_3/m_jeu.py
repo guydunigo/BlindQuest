@@ -17,7 +17,6 @@ import os
 import pyglet
 print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").")
 print()
-print()
 
 #Importation des constantes :
 import constantes as cs
