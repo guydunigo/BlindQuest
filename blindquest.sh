@@ -2,10 +2,10 @@
 
 case $1 in
 	""|-3|--python3)
-		python3 ./src/main.py
+		python3 ./src_3/main.py
 	;;
 	-2|--python2)
-		python2 ./src/main.py
+		python2 ./src_2/main.py
 	;;
 	--install|-i)
 		echo "[Desktop Entry]
