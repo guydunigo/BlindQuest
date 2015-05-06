@@ -58,7 +58,7 @@ class Jeu (object) :
 		#Initialisation des booléens de fin de jeu, de combat et de pause :
 		self.isEnd = False
 		self.isCombat = False
-		self.isPaused = False
+		self.isPaused = None
 
 
 	def charger_sons(self) :
@@ -236,12 +236,19 @@ class Jeu (object) :
 
 
 	def pause(self) :
-		"""Cette méthode met en pause le jeu et les lecteurs."""
-		self.isPaused
-		for i in self.lecteurs :
-			if i.playing :
-				
-		pass
+		"""Cette méthode met en pause le jeu, c'est à dire les lecteurs actifs, et les remets en route."""
+		#Si self.isPaused ne vaut pas None (aka des lecteurs sont en pause), on transforme self.isPaused en liste et on y ajoute les lecteurs actifs et on met ces derniers en pause : :
+		if not self.isPaused :
+			self.isPaused = []
+			for i in self.lecteurs :
+				if self.lecteurs[i].playing :
+					self.isPaused.append(i)
+					self.lecteurs[i].pause()
+		#SI des lecteurs sont en pause, on les remet en route :
+		else :
+			for i in self.isPaused :
+				self.lecteurs[i].play()
+			self.isPaused = None
 
 
 	def save(self) :
