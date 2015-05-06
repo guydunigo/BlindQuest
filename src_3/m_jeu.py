@@ -15,8 +15,7 @@ import os
 #Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 
 import pyglet
-print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").")
-print()
+print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").", end='\n\n')
 
 #Importation des constantes :
 import constantes as cs
@@ -30,29 +29,31 @@ class Jeu (object) :
 		"""Constructeur : 
 			carte_type : type de carte à utiliser durant le jeu. (carte nommée selon l'exemple : carte_NOM.txt et placée dans le dossier cartes)"""
 
-		#Si on se trouve dans le dossier src, on va dans le dossier principal.
-		if "/src_3" in os.getcwd()[-4:] :
+		#Si le dossier de travail de python (le dossier depuis lequel python a été lancé) est le dossier du code source ('src_3'), on va dans le dossier principal.
+		if "/src_3" in os.getcwd()[-6:] :
+			print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).", end="\n\n")
 			os.chdir("../")
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
 		pyglet.resource.path = [os.path.join(working_dir,'..')]
 		pyglet.resource.reindex()
-		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marche pas)
+
+		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas)
 		#pyglet.options['audio'] = ('openal',)
 
-		#Chargement de la carte.
+		#Chargement de la carte :
 		self.carte = mc.Carte(type_carte)
-		#Chargement des sons
+		#Chargement des sons :
 		self.charger_sons()
-		#Lecteurs (environnement(s), action(s), heartbeats,...)
+		#Lecteurs (environnement(s), action(s), heartbeats,...) :
 		self.creer_lecteurs()	
-		#Fenêtre (activation du plein écran ?par défaut?)
+		#Fenêtre (activation du plein écran ?par défaut?) :
 		self.creer_fenetre()
 		#Création des evènements... (clavier, ...) ou utilisation de raw_input? 
 		self.init_events()
 
 		#Initialisation de la vie du personnage
-		self.vie = 10 #A changer
+		self.vie = cs.VIE
 
 		#Initialisation des booléens de fin de jeu, de combat et de pause :
 		self.isEnd = False
@@ -61,15 +62,16 @@ class Jeu (object) :
 
 
 	def charger_sons(self) :
-		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'etension '.wav'.
-		On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de source déjà queued. ("Un peu" BOURIN et peut-être bouffe-mémoire)"""
+		"""Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'extension '.wav'.
+		On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de 'source already queued'. ("Un peu" BOURIN et bouffe-mémoire)"""
 
 		#On prévient que le temps de chargement est normal :
 		print("Chargement des sons en mémoire...")
 
 		#On crée le dictionnaire de sons :
 		self.sons = {}
-		try :
+
+		if "sons" in os.listdir() :
 			#On récupère la liste des fichiers du dossier 'sons' :
 			liste_sons = os.listdir("sons")
 
@@ -79,23 +81,21 @@ class Jeu (object) :
 			#On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'etension '.wav' :
 			for son in liste_sons :
 				self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son), streaming = False)
-
-		except FileNotFoundError :
-			print("Le dossier 'sons' contenant les sons (héhé) n'a pas été trouvé.")
-			self.sons = None
+		else :
+			#On lève une erreur si le dossier 'sons' n'a pas été trouvé.
+			raise FileNotFoundError("Le dossier 'sons' n'a pas été trouvé.")
 
 
 	def creer_lecteurs(self) :
-		"""Crée les lecteurs pyglet, les lecteurs env, eau, et heartbeat sont réglés pour tourner en boucle sur la musique en cours : 
-			- env : Pour l'environnement, en boucle.
-			- action : Pour les différentes actions (déplacements, coups,...). : peut-être inutile (directement son.play()).
-			- monstre : Bruit du monstre qui indique que l'on est sur la case d'un monstre.: peut-être inutile
+		"""Crée les lecteurs pyglet, les lecteurs env, heartbeat, et les lecteurs de proximités (définits dans le fichier constantes) sont réglés pour tourner en boucle sur la musique en cours : 
+			- env : Pour l'environnement ou le combat, en boucle.
 			- heartbeat : Si il ne reste qu'une vie, on entend un bâttement de coeur, en boucle.
-			- Les différents sons de proximité ont leur propre lecteur.
+			- Les différents sons de proximité ont leur propre lecteur, en boucle.
+			- Monstre : peut-être inutile, bruit du monstre de temps en temps.
 		"""
 		
 		self.lecteurs = {}
-		for lecteur in ("env", "monstre", "action", "heartbeat"):
+		for lecteur in ("env", "monstre", "heartbeat"):
 			self.lecteurs[lecteur] = pyglet.media.Player()
 			if lecteur == "env" :
 				#En boucle
@@ -116,10 +116,19 @@ class Jeu (object) :
 		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
 		self.lecteurs["env"].play()
 
+		#Affichage des volumes des différents lecteurs :
+		print("   Volume des lecteurs :")
+		for i in self.lecteurs :
+			  print("    - ",i," : ",self.lecteurs[i].volume)
+
  
 	def creer_fenetre(self) :
-		"""Crée la fenêtre pyglet en plein écran."""
+		"""Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
 		self.window = pyglet.window.Window(fullscreen = True)
+		
+		#On affiche l'aide pendant 5 secondes :
+		self.afficher_aide()
+		time.sleep(5)
 
 
 	def init_events(self) :
@@ -228,6 +237,10 @@ class Jeu (object) :
 
 	def pause(self) :
 		"""Cette méthode met en pause le jeu et les lecteurs."""
+		self.isPaused
+		for i in self.lecteurs :
+			if i.playing :
+				
 		pass
 
 

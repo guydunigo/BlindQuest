@@ -69,9 +69,9 @@ class Carte (object) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
 		Une erreur est levée si un type autre que chaîne de caractères est donné ou si le dossier ou le fichier n'existe pas"""
 
+
 		with open(os.path.join(dossier, nom_fichier + ".txt"), 'r') as fichier_carte :
 			self.charger_carte(fichier_carte)
-
 
 	def charger_carte(self, fichier_carte) :
 		"""Charge le contenu d'un fichier carte dans une liste de liste de int, si les lignes ne sont pas toutes de la même taille, on les complète par de l'eau."""
@@ -82,8 +82,10 @@ class Carte (object) :
 		#On récupère les lignes sous forme de chaîne de caractères rangés dans une liste :
 		fichier = fichier_carte.read().split("\n")
 		#On récupère les entiers séparés par des espaces dans chaque élément de la liste :
+
 		for i in range(len(fichier) - 1) :
 			self.carte.append([int(a) for a in fichier[i].split() if a != ''])
+
 		#On enlève la dernière ligne créée inutilement si un retour à une ligne vide a été fait à la fin du fichier carte :
 		if self.carte[-1] == []:
 			del(self.carte[-1])
@@ -139,7 +141,6 @@ class Carte (object) :
 		#Plus sérieusement, le type d'erreur levée pourra être changé.
 		if not found :
 			print(self.carte)
-			raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
 
 
 	def move(self, direction = None) :

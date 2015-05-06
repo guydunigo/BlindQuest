@@ -13,6 +13,9 @@
 #Carte utilisée :
 CARTE = "petite"
 
+#Quantité de vie du personnage :
+VIE = 10
+
 #Tous les types utilisés dans la carte devront être définis ici et le nom des sons leur correspondant devra être le même que le dictionnaire de conversion.
 #Il est possible d'ajouter un type de monstre ou de case dangeureuse, etc les ajoutant dans les diverses catégories
 
