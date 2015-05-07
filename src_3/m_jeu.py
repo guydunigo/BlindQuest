@@ -237,7 +237,7 @@ class Jeu (object) :
 
 	def pause(self) :
 		"""Cette méthode met en pause le jeu, c'est à dire les lecteurs actifs, et les remets en route."""
-		#Si self.isPaused ne vaut pas None (aka des lecteurs sont en pause), on transforme self.isPaused en liste et on y ajoute les lecteurs actifs et on met ces derniers en pause : :
+		#Si self.isPaused ne vaut pas None (aka des lecteurs sont en pause), on transforme self.isPaused en liste et on y ajoute les lecteurs actifs et on met ces derniers en pause :
 		if not self.isPaused :
 			self.isPaused = []
 			for i in self.lecteurs :

@@ -32,12 +32,12 @@ class Carte (object) :
 
 			self.ouvrir_fichier_carte("cartes", "carte_" + str(type_carte))
 			self.trouver_depart()
+			self.player_info = []
 
-		#Pour plus tard lors du chargement de sauvegardes. 
-#		else :
-#			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
-#			self.posx = self.carte[-1][1]
-#			self.posy = self.carte[-1][2]
+		#Lors du chargement de sauvegardes (quand num_sauv est définit) :
+		else :
+			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
+			self.get_player_info()
 
 
 	#Encapsulation pour l'absisse du joueur (posx) :
@@ -67,17 +67,13 @@ class Carte (object) :
 
 	def ouvrir_fichier_carte(self, dossier, nom_fichier) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
-		Une erreur est levée si un type autre que chaîne de caractères est donné ou si le dossier ou le fichier n'existe pas"""
+		Une erreur est levée si le dossier ou le fichier n'existe pas"""
 
-		try:
-			with open(os.path.join(dossier, nom_fichier + ".txt"), 'r') as fichier_carte :
+		if dossier in os.listdir() and str(nom_fichier) + ".txt" in os.listdir(dossier) :
+			with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte :
 				self.charger_carte(fichier_carte)
-
-		except TypeError :
-			raise TypeError("Le type de carte choisi ou le nom du dossier n'est pas une chaîne de caractères, utilisation de la carte par défaut.")
-
-		except FileNotFoundError :
-			raise FileNotFoundError("Il n'existe pas de fichier carte nommé {} dans le dossier '{}', utilisation de la carte par défaut.".format(nom_fichier + ".txt", dossier))
+		else :
+			raise FileNotFoundError("Il n'existe pas de fichier carte nommé {} dans le dossier '{}'.".format(nom_fichier + ".txt", dossier))
 
 
 	def charger_carte(self, fichier_carte) :
@@ -93,7 +89,7 @@ class Carte (object) :
 			for i in range(len(fichier) - 1) :
 				self.carte.append([int(a) for a in fichier[i].split() if a != ''])
 		except ValueError :
-			raise ValueError("Un caractère présent sur la carte n'est pas un nombre")
+			raise ValueError("FICHIER CARTE CORROMPU : Un caractère présent sur la carte n'est pas un nombre")
 
 		#On enlève la dernière ligne créée inutilement si un retour à une ligne vide a été fait à la fin du fichier carte :
 		if self.carte[-1] == []:
@@ -114,18 +110,17 @@ class Carte (object) :
 				liste.append(cs.EAU)
 
 
-#	def get_player_info(self):
-#		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme ['#', posx, posy, vie, bonus...].
-#		Cette méthode renvoie cette liste sans les information concernant la position du joueur."""
+	def get_player_info(self):
+		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme [posx, posy, vie, bonus...].
+		Cette méthode stocke cette liste sans les information concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
 
-#		#On récupère la dernière ligne. 
-#		infos = self.carte[-1]
-#		#On enlève l'absisse et l'ordonnée du joueur.
-#		del infos[0:2]
-#		#On enlève la dernière ligne de la carte.
-#		del self.carte[-1]
-		
-#		return infos
+		#On récupère la dernière ligne. 
+		self.player_info = self.carte[-1]
+		#On récupère l'absisse et l'ordonnée du joueur et on les enlève de player_info.
+		self.posx, self.posy = self.player_info[0:2]
+		del self.player_info[0:2]
+		#On enlève la dernière ligne de la carte.
+		del self.carte[-1]
 
 
 	def trouver_depart(self) :
@@ -149,7 +144,6 @@ class Carte (object) :
 		#Si la valeur de départ n'est pas trouvée, on lève une erreur de valeur (ça paraît logique) : 
 		#Plus sérieusement, le type d'erreur levée pourra être changé.
 		if not found :
-			print(self.carte)
 			raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
 
 
