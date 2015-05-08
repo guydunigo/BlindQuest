@@ -15,7 +15,8 @@ import os
 #Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 
 import pyglet
-print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").", end='\n\n')
+print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").")
+print()
 
 #Importation des constantes :
 import constantes as cs
@@ -31,7 +32,8 @@ class Jeu (object) :
 
 		#Si le dossier de travail de python (le dossier depuis lequel python a été lancé) est le dossier du code source ('src_3'), on va dans le dossier principal.
 		if "/src_3" in os.getcwd()[-6:] :
-			print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).", end="\n\n")
+			print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).")
+			print()
 			os.chdir("../")
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -39,14 +41,14 @@ class Jeu (object) :
 		pyglet.resource.reindex()
 
 		#On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas)
-		#pyglet.options['audio'] = ('openal',)
+		pyglet.options['audio'] = ('openal',)
 
 		#Chargement de la carte :
 		self.carte = mc.Carte(type_carte)
 		#Chargement des sons :
 		self.charger_sons()
 		#Lecteurs (environnement(s), action(s), heartbeats,...) :
-		self.creer_lecteurs()	
+		self.creer_lecteurs()
 		#Fenêtre (activation du plein écran ?par défaut?) :
 		self.creer_fenetre()
 		#Création des evènements... (clavier, ...) ou utilisation de raw_input? 
@@ -55,7 +57,7 @@ class Jeu (object) :
 		#Initialisation de la vie du personnage
 		self.vie = cs.VIE
 
-		#Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide :
+		#Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde :
 		self.state = "debut"
 		#Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
 		self.paused = []
@@ -71,7 +73,7 @@ class Jeu (object) :
 		#On crée le dictionnaire de sons :
 		self.sons = {}
 
-		if "sons" in os.listdir() :
+		if "sons" in os.listdir('.') :
 			#On récupère la liste des fichiers du dossier 'sons' :
 			liste_sons = os.listdir("sons")
 
@@ -100,17 +102,18 @@ class Jeu (object) :
 			if lecteur == "env" :
 				#En boucle
 				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+				self.lecteurs[lecteur].volume = 0.7
 			if lecteur == "heartbeat" :
 				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 				self.lecteurs[lecteur].queue(self.sons[lecteur])
-				self.lecteurs[lecteur].volume = 0.05
+				self.lecteurs[lecteur].volume = 1.0
 
 		#Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
 		for lecteur in cs.PROX :
 			self.lecteurs[lecteur] = pyglet.media.Player()
 			self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 			self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-			self.lecteurs[lecteur].volume = 0.05
+			self.lecteurs[lecteur].volume = 0.5
 
 		#On restitue l'environnement sonore de départ.
 		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
@@ -183,7 +186,6 @@ class Jeu (object) :
 			if self.state[-1] == 'H' :
 				self.state = self.state.replace('H','')
 
-
 		@self.window.event
 		def on_draw() :
 			"""On efface l'écran, peut-être sera-t-il impossible de voir l'aide : dans ce cas, l'enlever et regarder quand la touche est relachée."""
@@ -191,11 +193,11 @@ class Jeu (object) :
 			if self.state == "debut" :
 				#On affiche l'aide :
 				self.afficher_aide()
-				#On affiche le messae de bienvenue :
-				pyglet.text.Label("Réglez le volume sonore puis appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
+				#On affiche le message de bienvenue :
+				pyglet.text.Label(u"Appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
 			elif self.paused != [] :
-				pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...").draw()
-			elif self.state[-1] == 'H' :
+				pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x = 20, y = 20).draw()
+			if self.state[-1] == 'H' :
 				self.afficher_aide()
 
 
@@ -267,14 +269,14 @@ class Jeu (object) :
 
 	def save(self) :
 		"""Sauvegarde la partie."""
-		if "saves" not in os.listdir() :
+		if "saves" not in os.listdir('.') :
 			os.mkdir("saves")
 
 
 	def load(self) :
 		"""Charge une partie."""
 		#Demander nom de la sauvegarde ou afficher le nom de la sauvegarde :
-		if "saves" in os.listdir() :
+		if "saves" in os.listdir('.') :
 			liste_sauv = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
 			if liste_sauv != [] :
 				message = "Choisissez une sauvegarde à charger :\n"
@@ -286,7 +288,7 @@ class Jeu (object) :
 				#Afficher un message : pas sauvegardes
 
 			pyglet.text.Label(message).draw() #Texte à changer
-			
+
 		else :
 			pass
 			#Afficher un message, pas de dossier de sauvegardes trouvé

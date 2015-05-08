@@ -69,7 +69,7 @@ class Carte (object) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
 		Une erreur est levée si le dossier ou le fichier n'existe pas"""
 
-		if dossier in os.listdir() and str(nom_fichier) + ".txt" in os.listdir(dossier) :
+		if dossier in os.listdir('.') and str(nom_fichier) + ".txt" in os.listdir(dossier) :
 			with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte :
 				self.charger_carte(fichier_carte)
 		else :

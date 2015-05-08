@@ -32,12 +32,12 @@ class Carte (object) :
 
 			self.ouvrir_fichier_carte("cartes", "carte_" + str(type_carte))
 			self.trouver_depart()
+			self.player_info = []
 
-		#Pour plus tard lors du chargement de sauvegardes. 
-#		else :
-#			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
-#			self.posx = self.carte[-1][1]
-#			self.posy = self.carte[-1][2]
+		#Lors du chargement de sauvegardes (quand num_sauv est définit) :
+		else :
+			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
+			self.get_player_info()
 
 
 	#Encapsulation pour l'absisse du joueur (posx) :
@@ -67,11 +67,12 @@ class Carte (object) :
 
 	def ouvrir_fichier_carte(self, dossier, nom_fichier) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
-		Une erreur est levée si un type autre que chaîne de caractères est donné ou si le dossier ou le fichier n'existe pas"""
+		Une erreur est levée si le dossier ou le fichier n'existe pas"""
 
+		if dossier in os.listdir('.') and str(nom_fichier) + ".txt" in os.listdir(dossier) :
+			with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte :
+				self.charger_carte(fichier_carte)
 
-		with open(os.path.join(dossier, nom_fichier + ".txt"), 'r') as fichier_carte :
-			self.charger_carte(fichier_carte)
 
 	def charger_carte(self, fichier_carte) :
 		"""Charge le contenu d'un fichier carte dans une liste de liste de int, si les lignes ne sont pas toutes de la même taille, on les complète par de l'eau."""
@@ -82,7 +83,6 @@ class Carte (object) :
 		#On récupère les lignes sous forme de chaîne de caractères rangés dans une liste :
 		fichier = fichier_carte.read().split("\n")
 		#On récupère les entiers séparés par des espaces dans chaque élément de la liste :
-
 		for i in range(len(fichier) - 1) :
 			self.carte.append([int(a) for a in fichier[i].split() if a != ''])
 
@@ -105,18 +105,17 @@ class Carte (object) :
 				liste.append(cs.EAU)
 
 
-#	def get_player_info(self):
-#		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme ['#', posx, posy, vie, bonus...].
-#		Cette méthode renvoie cette liste sans les information concernant la position du joueur."""
+	def get_player_info(self):
+		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme [posx, posy, vie, bonus...].
+		Cette méthode stocke cette liste sans les information concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
 
-#		#On récupère la dernière ligne. 
-#		infos = self.carte[-1]
-#		#On enlève l'absisse et l'ordonnée du joueur.
-#		del infos[0:2]
-#		#On enlève la dernière ligne de la carte.
-#		del self.carte[-1]
-		
-#		return infos
+		#On récupère la dernière ligne. 
+		self.player_info = self.carte[-1]
+		#On récupère l'absisse et l'ordonnée du joueur et on les enlève de player_info.
+		self.posx, self.posy = self.player_info[0:2]
+		del self.player_info[0:2]
+		#On enlève la dernière ligne de la carte.
+		del self.carte[-1]
 
 
 	def trouver_depart(self) :
@@ -136,12 +135,6 @@ class Carte (object) :
 					found = True
 				i += 1
 			j += 1
-
-		#Si la valeur de départ n'est pas trouvée, on lève une erreur de valeur (ça paraît logique) : 
-		#Plus sérieusement, le type d'erreur levée pourra être changé.
-		if not found :
-			print(self.carte)
-
 
 	def move(self, direction = None) :
 		"""Fonction qui déplace le joueur et renvoie le code de la case d'arrivée du joueur.

@@ -16,6 +16,7 @@ import os
 
 import pyglet
 print("Utilisation de la version de pyglet du dossier src/ (",pyglet.version,").")
+print()
 
 #Importation des constantes :
 import constantes as cs
@@ -32,6 +33,7 @@ class Jeu (object) :
 		#Si le dossier de travail de python (le dossier depuis lequel python a été lancé) est le dossier du code source ('src_3'), on va dans le dossier principal.
 		if "/src_3" in os.getcwd()[-6:] :
 			print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).")
+			print()
 			os.chdir("../")
 		#Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
 		working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -55,10 +57,10 @@ class Jeu (object) :
 		#Initialisation de la vie du personnage
 		self.vie = cs.VIE
 
-		#Initialisation des booléens de fin de jeu, de combat et de pause :
-		self.isEnd = False
-		self.isCombat = False
-		self.isPaused = False
+		#Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde :
+		self.state = "debut"
+		#Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
+		self.paused = []
 
 
 	def charger_sons(self) :
@@ -70,17 +72,17 @@ class Jeu (object) :
 
 		#On crée le dictionnaire de sons :
 		self.sons = {}
-		
-		#On lève une erreur si le dossier 'sons' n'a pas été trouvé.
-		#On récupère la liste des fichiers du dossier 'sons' :
-		liste_sons = os.listdir("sons")
 
-		#On ne garde que les fichiers 'wav' :
-		liste_sons = [ fichier for fichier in liste_sons if fichier.find(".wav") != -1]
+		if "sons" in os.listdir('.') :
+			#On récupère la liste des fichiers du dossier 'sons' :
+			liste_sons = os.listdir("sons")
 
-		#On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'etension '.wav' :
-		for son in liste_sons :
-			self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son), streaming = False)
+			#On ne garde que les fichiers 'wav' :
+			liste_sons = [ fichier for fichier in liste_sons if fichier.find(".wav") != -1]
+
+			#On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'etension '.wav' :
+			for son in liste_sons :
+				self.sons[son.replace(".wav",'')] = pyglet.media.load(os.path.join("sons", son), streaming = False)
 
 
 	def creer_lecteurs(self) :
@@ -97,17 +99,18 @@ class Jeu (object) :
 			if lecteur == "env" :
 				#En boucle
 				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+				self.lecteurs[lecteur].volume = 0.7
 			if lecteur == "heartbeat" :
 				self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 				self.lecteurs[lecteur].queue(self.sons[lecteur])
-				self.lecteurs[lecteur].volume = 0.05
+				self.lecteurs[lecteur].volume = 1.0
 
 		#Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
 		for lecteur in cs.PROX :
 			self.lecteurs[lecteur] = pyglet.media.Player()
 			self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
 			self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-			self.lecteurs[lecteur].volume = 0.05
+			self.lecteurs[lecteur].volume = 0.5
 
 		#On restitue l'environnement sonore de départ.
 		self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
@@ -122,10 +125,6 @@ class Jeu (object) :
 	def creer_fenetre(self) :
 		"""Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
 		self.window = pyglet.window.Window(fullscreen = True)
-		
-		#On affiche l'aide pendant 5 secondes :
-		self.afficher_aide()
-		time.sleep(5)
 
 
 	def init_events(self) :
@@ -136,6 +135,7 @@ class Jeu (object) :
 				  - F : Plein écran
 				  - H : Aide
 				  - C : Charger une Sauvegarde
+				  - P : Mettre en pause et reprendre
 				- Lors de pérégrinations diverses :
 				  - flèches directionnelles : se déplacer
 				  - S : Sauvegarder
@@ -143,13 +143,14 @@ class Jeu (object) :
 				  - ..."""
 		
 		@self.window.event
-		def on_key_press(symbol, modifiers):
+		def on_key_press(symbol, modifiers) :
 			#Fullscreen
 			if symbol == pyglet.window.key.F :
 				self.window.set_fullscreen(not self.window.fullscreen)
 			#Aide
 			elif symbol == pyglet.window.key.H :
-				self.afficher_aide()
+				if self.state[-1] != 'H' :
+					self.state += 'H'
 			#Pause
 			elif symbol == pyglet.window.key.P :
 				self.pause()
@@ -157,28 +158,45 @@ class Jeu (object) :
 			elif symbol == pyglet.window.key.C :
 				self.load()
 
-			if not self.isEnd and not self.isPaused :
-				if not self.isCombat :
-					#Déplacements
-					if symbol == pyglet.window.key.UP :
-						self.move("NORD")
-					elif symbol == pyglet.window.key.DOWN :
-						self.move("SUD")
-					elif symbol == pyglet.window.key.RIGHT :
-						self.move("EST")
-					elif symbol == pyglet.window.key.LEFT :
-						self.move("OUEST")
-					#Sauvegarder
-					elif symbol == pyglet.window.key.S :
-						self.save()
-				else :
-					if symbol == pyglet.window.key.A : # À changer.
-						pass
+			if self.state == "normal" :
+				#Déplacements
+				if symbol == pyglet.window.key.UP :
+					self.move("NORD")
+				elif symbol == pyglet.window.key.DOWN :
+					self.move("SUD")
+				elif symbol == pyglet.window.key.RIGHT :
+					self.move("EST")
+				elif symbol == pyglet.window.key.LEFT :
+					self.move("OUEST")
+				#Sauvegarder
+				elif symbol == pyglet.window.key.S :
+					self.save()
+			elif self.state == "combat" :
+				if symbol == pyglet.window.key.A : # À changer.
+					pass
+			elif self.state == "debut" and symbol == pyglet.window.key.SPACE :
+				self.state = "normal"
 
 		@self.window.event
-		def on_draw():
+		def on_key_release(symbol, modifiers) :
+			print(self.state)
+			if self.state[-1] == 'H' :
+				self.state = self.state.replace('H','')
+
+
+		@self.window.event
+		def on_draw() :
 			"""On efface l'écran, peut-être sera-t-il impossible de voir l'aide : dans ce cas, l'enlever et regarder quand la touche est relachée."""
 			self.window.clear()
+			if self.state == "debut" :
+				#On affiche l'aide :
+				self.afficher_aide()
+				#On affiche le messae de bienvenue :
+				pyglet.text.Label(u"Réglez le volume sonore puis appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
+			elif self.paused != [] :
+				pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x = 20, y = 20).draw()
+			if self.state[-1] == 'H' :
+				self.afficher_aide()
 
 
 	def move(self, direction = None) :
@@ -217,7 +235,7 @@ class Jeu (object) :
 
 	def afficher_aide(self) :
 		"""Fonction qui affiche l'aide (tiens, tiens...)."""
-		pass
+		pyglet.text.Label("test de l'aide", x = 20, y = 200).draw()
 
 
 	def fin(self, type_fin) :
@@ -233,19 +251,45 @@ class Jeu (object) :
 
 
 	def pause(self) :
-		"""Cette méthode met en pause le jeu et les lecteurs."""
-		pass
+		"""Cette méthode met en pause le jeu, c'est à dire les lecteurs actifs, et les remets en route."""
+		#Si self.paused est une liste vide  (aka aucun lecteur n'est en pause), on ajoute les lecteurs actifs a cette liste et on met ces derniers en pause :
+		if self.paused == [] :
+			for i in self.lecteurs :
+				if self.lecteurs[i].playing :
+					self.paused.append(i)
+					self.lecteurs[i].pause()
+		#SI des lecteurs sont en pause, on les remet en route :
+		else :
+			for i in self.paused :
+				self.lecteurs[i].play()
+			self.paused = []
 
 
 	def save(self) :
 		"""Sauvegarde la partie."""
-		pass
+		if "saves" not in os.listdir('.') :
+			os.mkdir("saves")
 
 
 	def load(self) :
 		"""Charge une partie."""
-		pass
+		#Demander nom de la sauvegarde ou afficher le nom de la sauvegarde :
+		if "saves" in os.listdir('.') :
+			liste_sauv = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
+			if liste_sauv != [] :
+				message = "Choisissez une sauvegarde à charger :\n"
+				for i, j in enumerate(liste_sauv) :
+					message.append("{} : {}".format(i,j)) 
+				self.carte = mc.Carte(carte, num)
+			else :
+				message = "Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
+				#Afficher un message : pas sauvegardes
 
+			pyglet.text.Label(message).draw() #Texte à changer
+			
+		else :
+			pass
+			#Afficher un message, pas de dossier de sauvegardes trouvé
 
 	def run(self) :
 
