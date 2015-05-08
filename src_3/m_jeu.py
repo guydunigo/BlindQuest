@@ -55,10 +55,10 @@ class Jeu (object) :
 		#Initialisation de la vie du personnage
 		self.vie = cs.VIE
 
-		#Initialisation des booléens de fin de jeu, de combat et de pause :
-		self.isEnd = False
-		self.isCombat = False
-		self.isPaused = None
+		#Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide :
+		self.state = "debut"
+		#Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
+		self.paused = []
 
 
 	def charger_sons(self) :
@@ -125,10 +125,6 @@ class Jeu (object) :
 	def creer_fenetre(self) :
 		"""Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
 		self.window = pyglet.window.Window(fullscreen = True)
-		
-		#On affiche l'aide pendant 5 secondes :
-		self.afficher_aide()
-		time.sleep(5)
 
 
 	def init_events(self) :
@@ -139,6 +135,7 @@ class Jeu (object) :
 				  - F : Plein écran
 				  - H : Aide
 				  - C : Charger une Sauvegarde
+				  - P : Mettre en pause et reprendre
 				- Lors de pérégrinations diverses :
 				  - flèches directionnelles : se déplacer
 				  - S : Sauvegarder
@@ -146,13 +143,14 @@ class Jeu (object) :
 				  - ..."""
 		
 		@self.window.event
-		def on_key_press(symbol, modifiers):
+		def on_key_press(symbol, modifiers) :
 			#Fullscreen
 			if symbol == pyglet.window.key.F :
 				self.window.set_fullscreen(not self.window.fullscreen)
 			#Aide
 			elif symbol == pyglet.window.key.H :
-				self.afficher_aide()
+				if self.state[-1] != 'H' :
+					self.state += 'H'
 			#Pause
 			elif symbol == pyglet.window.key.P :
 				self.pause()
@@ -160,28 +158,45 @@ class Jeu (object) :
 			elif symbol == pyglet.window.key.C :
 				self.load()
 
-			if not self.isEnd and not self.isPaused :
-				if not self.isCombat :
-					#Déplacements
-					if symbol == pyglet.window.key.UP :
-						self.move("NORD")
-					elif symbol == pyglet.window.key.DOWN :
-						self.move("SUD")
-					elif symbol == pyglet.window.key.RIGHT :
-						self.move("EST")
-					elif symbol == pyglet.window.key.LEFT :
-						self.move("OUEST")
-					#Sauvegarder
-					elif symbol == pyglet.window.key.S :
-						self.save()
-				else :
-					if symbol == pyglet.window.key.A : # À changer.
-						pass
+			if self.state == "normal" :
+				#Déplacements
+				if symbol == pyglet.window.key.UP :
+					self.move("NORD")
+				elif symbol == pyglet.window.key.DOWN :
+					self.move("SUD")
+				elif symbol == pyglet.window.key.RIGHT :
+					self.move("EST")
+				elif symbol == pyglet.window.key.LEFT :
+					self.move("OUEST")
+				#Sauvegarder
+				elif symbol == pyglet.window.key.S :
+					self.save()
+			elif self.state == "combat" :
+				if symbol == pyglet.window.key.A : # À changer.
+					pass
+			elif self.state == "debut" and symbol == pyglet.window.key.SPACE :
+				self.state = "normal"
 
 		@self.window.event
-		def on_draw():
+		def on_key_release(symbol, modifiers) :
+			print(self.state)
+			if self.state[-1] == 'H' :
+				self.state = self.state.replace('H','')
+
+
+		@self.window.event
+		def on_draw() :
 			"""On efface l'écran, peut-être sera-t-il impossible de voir l'aide : dans ce cas, l'enlever et regarder quand la touche est relachée."""
 			self.window.clear()
+			if self.state == "debut" :
+				#On affiche l'aide :
+				self.afficher_aide()
+				#On affiche le messae de bienvenue :
+				pyglet.text.Label("Réglez le volume sonore puis appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
+			elif self.paused != [] :
+				pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...").draw()
+			elif self.state[-1] == 'H' :
+				self.afficher_aide()
 
 
 	def move(self, direction = None) :
@@ -220,7 +235,7 @@ class Jeu (object) :
 
 	def afficher_aide(self) :
 		"""Fonction qui affiche l'aide (tiens, tiens...)."""
-		pass
+		pyglet.text.Label("test de l'aide", x = 20, y = 200).draw()
 
 
 	def fin(self, type_fin) :
@@ -237,29 +252,44 @@ class Jeu (object) :
 
 	def pause(self) :
 		"""Cette méthode met en pause le jeu, c'est à dire les lecteurs actifs, et les remets en route."""
-		#Si self.isPaused ne vaut pas None (aka des lecteurs sont en pause), on transforme self.isPaused en liste et on y ajoute les lecteurs actifs et on met ces derniers en pause :
-		if not self.isPaused :
-			self.isPaused = []
+		#Si self.paused est une liste vide  (aka aucun lecteur n'est en pause), on ajoute les lecteurs actifs a cette liste et on met ces derniers en pause :
+		if self.paused == [] :
 			for i in self.lecteurs :
 				if self.lecteurs[i].playing :
-					self.isPaused.append(i)
+					self.paused.append(i)
 					self.lecteurs[i].pause()
 		#SI des lecteurs sont en pause, on les remet en route :
 		else :
-			for i in self.isPaused :
+			for i in self.paused :
 				self.lecteurs[i].play()
-			self.isPaused = None
+			self.paused = []
 
 
 	def save(self) :
 		"""Sauvegarde la partie."""
-		pass
+		if "saves" not in os.listdir() :
+			os.mkdir("saves")
 
 
 	def load(self) :
 		"""Charge une partie."""
-		pass
+		#Demander nom de la sauvegarde ou afficher le nom de la sauvegarde :
+		if "saves" in os.listdir() :
+			liste_sauv = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
+			if liste_sauv != [] :
+				message = "Choisissez une sauvegarde à charger :\n"
+				for i, j in enumerate(liste_sauv) :
+					message.append("{} : {}".format(i,j)) 
+				self.carte = mc.Carte(carte, num)
+			else :
+				message = "Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
+				#Afficher un message : pas sauvegardes
 
+			pyglet.text.Label(message).draw() #Texte à changer
+			
+		else :
+			pass
+			#Afficher un message, pas de dossier de sauvegardes trouvé
 
 	def run(self) :
 
