@@ -11,7 +11,7 @@
 #Définition des constantes
 
 #Carte utilisée :
-CARTE = "basic"
+CARTE = "test"
 
 #Quantité de vie du personnage :
 VIE = 10
@@ -29,7 +29,6 @@ SENTIER		= 5
 PONT		= 6
 SABLE		= 7
 MONTAGNE	= 8
-FORETPROFONDE	= 9
 MONSTRE		= 10
 BOSS		= 11
 BOSS_FINAL	= 12
@@ -51,7 +50,6 @@ CONV = {
 	SENTIER		: "sentier",
 	PONT		: "pont",
 	SABLE		: "sable",
-	FORETPROFONDE	: "foretprofonde",
 	MONSTRE		: "monstre",
 	BOSS		: "boss",
 	BOSS_FINAL	: "boss_final",
@@ -75,7 +73,7 @@ NOGO = (
 PROX = {
 	EAU	: 2** 0,
 	MER	: 2** 1,
-	PONT	: 2** 2
+	PONT	: 2** 2 | 2** 0 #On veut entendre l'eau couler avec le bruit du pont pour mieux comprendre que c'est un pont.
 }
 
 #Types de fins, les fichiers sons associés doivent exister et porter le même nom que la châine de caractère.

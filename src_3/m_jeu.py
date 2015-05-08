@@ -208,10 +208,19 @@ class Jeu (object) :
 
 		#On déplace le joueur su la carte et on récupère le code de la case d'arrivée. 
 		case = self.carte.move(direction)
+
 		if case != None :
 			#On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
 			infos_prox = int(case / 100)
 			case = case - infos_prox * 100
+
+			if case == cs.BONUS :
+				self.lecteurs["env"].pause()
+				self.sons[cs.CONV[cs.BONUS]].play()
+				case = self.carte.empty()
+				infos_prox = int(case / 100)
+				case = case - infos_prox * 100
+
 
 			print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
 
@@ -245,11 +254,10 @@ class Jeu (object) :
 			- type : chaîne de caractère décrivant la fin parmis celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
 		#On restitue le sons associé à la mort :
-		self.lecteurs["env"].queue(self.sons[type_fin])
-		self.lecteurs["env"].next_source()
+		self.sons[type_fin].play()
 
 		#On active l'état fin qui empèche de se déplacer et de sauvegarder : :
-		self.isEnd = True
+		self.state = "fin"
 
 
 	def pause(self) :
