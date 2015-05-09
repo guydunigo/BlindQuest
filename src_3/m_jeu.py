@@ -152,7 +152,7 @@ class Jeu (object) :
 				self.window.set_fullscreen(not self.window.fullscreen)
 			#Aide
 			elif symbol == pyglet.window.key.H :
-				if self.state[-1] != 'H' :
+				if 'H' in self.state :
 					self.state += 'H'
 			#Pause
 			elif symbol == pyglet.window.key.P :
@@ -183,7 +183,7 @@ class Jeu (object) :
 		@self.window.event
 		def on_key_release(symbol, modifiers) :
 			print(self.state)
-			if self.state[-1] == 'H' :
+			if 'H' in self.state :
 				self.state = self.state.replace('H','')
 
 		@self.window.event
@@ -197,9 +197,10 @@ class Jeu (object) :
 				pyglet.text.Label(u"Appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
 			elif self.paused != [] :
 				pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x = 20, y = 20).draw()
-			if self.state[-1] == 'H' :
+			if 'H' in self.state :
 				self.afficher_aide()
-
+			if 'S' in self.state :
+				pyglet.text.Label("Sauvegarde en cours...", x = 20, y = 20).draw()
 
 	def move(self, direction = None) :
 		"""Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
@@ -281,8 +282,12 @@ class Jeu (object) :
 
 	def save(self) :
 		"""Sauvegarde la partie."""
-		if "saves" not in os.listdir('.') :
-			os.mkdir("saves")
+		if "S" not in self.state :
+			self.state += "S"
+		print(self.state)
+		self.carte.save([self.vie])
+		time.sleep(3)
+		self.state.replace('S', '')
 
 
 	def load(self) :
@@ -293,7 +298,9 @@ class Jeu (object) :
 			if liste_sauv != [] :
 				message = "Choisissez une sauvegarde à charger :\n"
 				for i, j in enumerate(liste_sauv) :
-					message.append("{} : {}".format(i,j)) 
+					message += "{} : {}\n".format(i,j)
+				carte = "basic"
+				num = "0"
 				self.carte = mc.Carte(carte, num)
 			else :
 				message = "Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."

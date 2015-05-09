@@ -26,6 +26,9 @@ class Carte (object) :
 		#Initialisation de la position du joueur :
 		self._posx = 0
 		self._posy = 0
+		
+		#On sauvegarde le nom de la carte :
+		self.type_carte = type_carte
 
 		#Si on n'a pas de valeur donnée pour num_sauv (le numéro de la sauvegarde), on ouvre une carte nommée carte_NOM.txt dans le dossier cartes et on recherche le départ (codé 98).
 		if num_sauv == None :
@@ -36,7 +39,7 @@ class Carte (object) :
 
 		#Lors du chargement de sauvegardes (quand num_sauv est définit) :
 		else :
-			self.ouvrir_fichier_carte("saves", carte_type + "_" + num_sauv)
+			self.ouvrir_fichier_carte("saves", type_carte + "_" + num_sauv)
 			self.get_player_info()
 
 
@@ -235,17 +238,28 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 		return self.carte[self.posy][self.posx] + self.detect_prox() * 100
 
 
-	def save(self, nom_fichier, player_info) :
+	def save(self, player_info) :
 		sauv = self.carte
-		sauv.append([self.posx, self.posy] + player_info]
+		sauv.append([self.posx, self.posy] + player_info)
 
 		if "saves" not in os.listdir() :
 			os.mkdir("saves")
+			num_sauv = "0"
+		else :
+			list_sauv = [i.replace(self.type_carte + '_', '').replace(".txt", '') for i in os.listdir("saves") if self.type_carte in i] + ['0']
+			list_sauv.sort()
+			num_sauv = str(int(list_sauv[-1]) + 1)
+			print(num_sauv)
+			print(list_sauv)
 
-		with open("saves/{}.txt".format(nom_fichier), 'w') as fichier :
+		with open("saves/{}.txt".format(self.type_carte + "_" + num_sauv), 'w') as fichier :
 			for i in sauv :
 				for j in i :
-					fichier.write(str(j) + " ")
+					if j < 10 :
+						j = '0' + str(j)
+					else :
+						j = str(j)
+					fichier.write(j + " ")
 				fichier.write("\n")
 
 			
