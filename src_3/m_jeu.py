@@ -214,20 +214,24 @@ class Jeu (object) :
 			infos_prox = int(case / 100)
 			case = case - infos_prox * 100
 
-			if case == cs.BONUS :
-				self.lecteurs["env"].pause()
+			#Si on arrive sur une case bonus, le joueur reprend toute sa vie et on entend le jingle associé :
+			while case == cs.BONUS :
+				#On joue le jingle :
 				self.sons[cs.CONV[cs.BONUS]].play()
+				#On remet la vie du joueur au maximum :
+				self.vie = cs.VIE
+				#On vide la case et on récupère le nouveau type d'environnement :
 				case = self.carte.empty()
-				infos_prox = int(case / 100)
+				#On met à jour les valeurs de case et e proximité :
+				infos_prox = int(case/100)
 				case = case - infos_prox * 100
-
 
 			print("code case : ",cs.CONV[case],", ",case,", code proximité : ",infos_prox)
 
 			#Si le joueur arrive sur une case létale, on active la fin. 
 			if case in cs.DANGER :
 				self.fin(cs.DANGER[case])
-			
+
 			#Restitution de l'environnement actuel :
 			#Si la source est déjà active, on la remet au début.
 			if self.lecteurs["env"].source == self.sons[cs.CONV[case]] :
