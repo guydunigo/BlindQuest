@@ -233,3 +233,19 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 		
 		#On retourne la nouvelle valeur de la case :
 		return self.carte[self.posy][self.posx] + self.detect_prox() * 100
+
+
+	def save(self, nom_fichier, player_info) :
+		sauv = self.carte
+		sauv.append([self.posx, self.posy] + player_info]
+
+		if "saves" not in os.listdir() :
+			os.mkdir("saves")
+
+		with open("saves/{}.txt".format(nom_fichier), 'w') as fichier :
+			for i in sauv :
+				for j in i :
+					fichier.write(str(j) + " ")
+				fichier.write("\n")
+
+			
