@@ -214,21 +214,21 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
 
 	def empty(self) :
-		"""Méthode qui affecte à la case actuelle la valeur de la case à l'ouest si elle existe et si ce n'est pas une case où le joueur ne peut aller, sinon à l'est, au nord et enfin au sud.
+		"""Méthode qui affecte à la case actuelle la valeur de la case à l'ouest si elle existe et si ce n'est pas la case départ ou une case où le joueur ne peut aller, sinon à l'est, au nord et enfin au sud.
 		Renvoie le code de la case actuelle.
 		Par exemple : après avoir récupéré un bonus ou après avoir tué un monstre."""
 
 		#OUEST :
-		if self.posx > 0 and self.carte[self.posy][self.posx - 1] not in cs.NOGO :
+		if self.posx > 0 and self.carte[self.posy][self.posx - 1] not in cs.NOGO and self.carte[self.posy][self.posx - 1] != cs.DEPART :
 			self.carte[self.posy][self.posx] = self.carte[self.posy][self.posx - 1]
 		#EST :
-		elif self.posx < self.nb_colonnes - 1 and self.carte[self.posy][self.posx + 1] not in cs.NOGO :
+		elif self.posx < self.nb_colonnes - 1 and self.carte[self.posy][self.posx + 1] not in cs.NOGO and self.carte[self.posy][self.posx + 1] != cs.DEPART :
 			self.carte[self.posy][self.posx] = self.carte[self.posy][self.posx + 1]
 		#NORD :
-		elif self.posy > 0 and self.carte[self.posy - 1][self.posx + 1] not in cs.NOGO :
+		elif self.posy > 0 and self.carte[self.posy - 1][self.posx] not in cs.NOGO and self.carte[self.posy - 1][self.posx] != cs.DEPART :
 			self.carte[self.posy][self.posx] = self.carte[self.posy - 1][self.posx]
 		#SUD :
-		elif self.posy < self.nb_lignes - 1 and self.carte[self.posy + 1][self.posx] not in cs.NOGO :
+		elif self.posy < self.nb_lignes - 1 and self.carte[self.posy + 1][self.posx] not in cs.NOGO and self.carte[self.posy + 1][self.posx] != cs.DEPART :
 			self.carte[self.posy][self.posx] = self.carte[self.posy + 1][self.posx]
 		
 		#On retourne la nouvelle valeur de la case :
