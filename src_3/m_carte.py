@@ -45,7 +45,13 @@ class Carte (object) :
 		"""Accesseur de l'attribut posx"""
 		return self._posx
 	def _set_posx(self, new_posx) :
-		"""Mutateur de l'attribut posx. Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut."""
+		"""Mutateur de l'attribut posx.
+Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
+Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
+		if new_posx < 0 :
+			new_posx = self.nb_colonnes + new_posx
+		elif new_posx >= self.nb_colonnes :
+			new_posx -= self.nb_colonnes
 		if new_posx >= 0 and new_posx < self.nb_colonnes :
 			if self.carte[self.posy][new_posx] not in cs.NOGO :
 				self._posx = new_posx
@@ -58,7 +64,13 @@ class Carte (object) :
 		"""Accesseur de l'attribut posy"""
 		return self._posy
 	def _set_posy(self, new_posy) :
-		"""Mutateur de l'attribut posy. Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut."""
+		"""Mutateur de l'attribut posy.
+Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
+Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
+		if new_posy < 0 :
+			new_posy = self.nb_lignes + new_posy
+		elif new_posy >= self.nb_lignes :
+			new_posy -= self.nb_lignes
 		if new_posy >= 0 and new_posy < self.nb_lignes :
 			if self.carte[new_posy][self.posx] not in cs.NOGO :
 				self._posy = new_posy
@@ -67,7 +79,8 @@ class Carte (object) :
 
 	def ouvrir_fichier_carte(self, dossier, nom_fichier) :
 		"""Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
-		Une erreur est levée si le dossier ou le fichier n'existe pas"""
+		Une erreur est levée si le dossier ou le fichier n'existe pas.
+		Ne pas oublier d'utiliser la méthode get_player_info si on charge une sauvegarde."""
 
 		if dossier in os.listdir('.') and str(nom_fichier) + ".txt" in os.listdir(dossier) :
 			with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte :
@@ -114,13 +127,15 @@ class Carte (object) :
 		"""Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme [posx, posy, vie, bonus...].
 		Cette méthode stocke cette liste sans les information concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
 
-		#On récupère la dernière ligne. 
+		#On récupère la dernière ligne :
 		self.player_info = self.carte[-1]
-		#On récupère l'absisse et l'ordonnée du joueur et on les enlève de player_info.
+		#On récupère l'absisse et l'ordonnée du joueur et on les enlève de player_info :
 		self.posx, self.posy = self.player_info[0:2]
 		del self.player_info[0:2]
-		#On enlève la dernière ligne de la carte.
+		#On enlève la dernière ligne de la carte :
 		del self.carte[-1]
+		#On met à jour le nombre de lignes :
+		self.nb_lignes -= 1
 
 
 	def trouver_depart(self) :
