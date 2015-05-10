@@ -315,4 +315,4 @@ class Jeu (object) :
 
 	def run(self) :
 
-		pyglet.app.run()
+		pygle.app.run()
