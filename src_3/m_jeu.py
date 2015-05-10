@@ -152,7 +152,7 @@ class Jeu (object) :
 				self.window.set_fullscreen(not self.window.fullscreen)
 			#Aide
 			elif symbol == pyglet.window.key.H :
-				if 'H' in self.state :
+				if 'H' not in self.state :
 					self.state += 'H'
 			#Pause
 			elif symbol == pyglet.window.key.P :
@@ -185,6 +185,9 @@ class Jeu (object) :
 			print(self.state)
 			if 'H' in self.state :
 				self.state = self.state.replace('H','')
+			if 'S' in self.state :
+				time.sleep(1)
+				self.state = self.state.replace('S', '')
 
 		@self.window.event
 		def on_draw() :
@@ -201,6 +204,7 @@ class Jeu (object) :
 				self.afficher_aide()
 			if 'S' in self.state :
 				pyglet.text.Label("Sauvegarde en cours...", x = 20, y = 20).draw()
+
 
 	def move(self, direction = None) :
 		"""Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
@@ -284,10 +288,7 @@ class Jeu (object) :
 		"""Sauvegarde la partie."""
 		if "S" not in self.state :
 			self.state += "S"
-		print(self.state)
-		self.carte.save([self.vie])
-		time.sleep(3)
-		self.state.replace('S', '')
+			self.carte.save([self.vie])
 
 
 	def load(self) :

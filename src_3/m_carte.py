@@ -249,8 +249,6 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 			list_sauv = [i.replace(self.type_carte + '_', '').replace(".txt", '') for i in os.listdir("saves") if self.type_carte in i] + ['0']
 			list_sauv.sort()
 			num_sauv = str(int(list_sauv[-1]) + 1)
-			print(num_sauv)
-			print(list_sauv)
 
 		with open("saves/{}.txt".format(self.type_carte + "_" + num_sauv), 'w') as fichier :
 			for i in sauv :
@@ -261,5 +259,3 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 						j = str(j)
 					fichier.write(j + " ")
 				fichier.write("\n")
-
-			
