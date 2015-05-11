@@ -84,7 +84,7 @@ COMBAT		= "combat"
 
 #Dictionnaire décrivant les différents types de cases démarrant un combat ainsi que les caractéristiques de l'attaquant sous la forme (vie, dégats)
 
-COMBAT = {
+COMBAT_START = {
 	MONSTRE		: (1, 1),
 	BOSS		: (2, 2),
 	BOSS_FINAL	: (3, 3)
