@@ -59,6 +59,8 @@ class Jeu (object) :
 
     #Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde :
     self.state = "debut"
+    #Initialisation du numéro de sauvegarde chargé :
+    self.num_sauv = ""
     #Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
     self.paused = []
 
@@ -143,8 +145,8 @@ class Jeu (object) :
           - flèches directionnelles : se déplacer
           - S : Sauvegarder
         - Lors d'un combat :
-          - ..."""
-    
+        - ..."""
+
     @self.window.event
     def on_key_press(symbol, modifiers) :
       #Fullscreen
@@ -158,10 +160,35 @@ class Jeu (object) :
       elif symbol == pyglet.window.key.P :
         self.pause()
       #Charger
-      elif symbol == pyglet.window.key.C :
-        self.load()
+      elif symbol == pyglet.window.key.C and "C" not in self.state :
+        self.state += "C"
 
-      if self.state == "normal" :
+      #En cas de chargement :
+      if "C" in self.state :
+        if symbol == pyglet.window.key.ENTER :
+          self.load()
+        elif symbol == pyglet.window.key.NUM_0 or symbol == pyglet.window.key._0 :
+          self.num_sauv += "0"
+        elif symbol == pyglet.window.key.NUM_1 or symbol == pyglet.window.key._1 :
+          self.num_sauv += "1"
+        elif symbol == pyglet.window.key.NUM_2 or symbol == pyglet.window.key._2 :
+          self.num_sauv += "2"
+        elif symbol == pyglet.window.key.NUM_3 or symbol == pyglet.window.key._3 :
+          self.num_sauv += "3"
+        elif symbol == pyglet.window.key.NUM_4 or symbol == pyglet.window.key._4 :
+          self.num_sauv += "4"
+        elif symbol == pyglet.window.key.NUM_5 or symbol == pyglet.window.key._5 :
+          self.num_sauv += "5"
+        elif symbol == pyglet.window.key.NUM_6 or symbol == pyglet.window.key._6 :
+          self.num_sauv += "6"
+        elif symbol == pyglet.window.key.NUM_7 or symbol == pyglet.window.key._7 :
+          self.num_sauv += "7"
+        elif symbol == pyglet.window.key.NUM_8 or symbol == pyglet.window.key._8 :
+          self.num_sauv += "8"
+        elif symbol == pyglet.window.key.NUM_9 or symbol == pyglet.window.key._9 :
+          self.num_sauv += "9"
+      #En temps normal :
+      elif self.state == "normal" :
         #Déplacements
         if symbol == pyglet.window.key.UP :
           self.move("NORD")
@@ -174,9 +201,11 @@ class Jeu (object) :
         #Sauvegarder
         elif symbol == pyglet.window.key.S :
           self.save()
+      #Durant un combat :
       elif self.state == "combat" :
         if symbol == pyglet.window.key.A : # À changer.
           pass
+      #Au début :
       elif self.state == "debut" and symbol == pyglet.window.key.SPACE :
         self.state = "normal"
 
@@ -204,12 +233,19 @@ class Jeu (object) :
         self.afficher_aide()
       if 'S' in self.state :
         pyglet.text.Label("Sauvegarde en cours...", x = 20, y = 20).draw()
+      elif 'C' in self.state :
+        self.afficher_load()
 
 
   def move(self, direction = None) :
-    """Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
-      - direction : prend un chaîne de caractère parmis ("OUEST", "EST", "NORD", "SUD"). 
-          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+    """Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si 
+environnement dangereux, combat...) et lance les sons d'environnement et de 
+proximité.
+      - direction : prend un chaîne de caractère parmis ("OUEST", "EST", 
+"NORD", 
+"SUD"). 
+          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, 
+ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
 
     #On déplace le joueur su la carte et on récupère le code de la case d'arrivée. 
     case = self.carte.move(direction)
@@ -293,30 +329,28 @@ class Jeu (object) :
 
 
   def load(self) :
-    """Charge une partie."""
-    if "C" not in self.state :
-      self.state += "C"
+    """Charge une partie/Active le mode chargement."""
+    pass
 
-    #Demander nom de la sauvegarde ou afficher le nom de la sauvegarde :
+
+  def afficher_load(self) :
+    """Demande de choisir une sauvegarde et affiche les possibilités."""
     if "saves" in os.listdir('.') :
       liste_sauv = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
       if liste_sauv != [] :
-        message = "Choisissez une sauvegarde à charger :\n"
+        message = u"Choisissez une sauvegarde à charger :\n"
         for i, j in enumerate(liste_sauv) :
-          message += "{} : {}\n".format(i,j)
+          message += u"{} : {}\n".format(i,j)
         carte = "basic"
         num = "0"
         self.carte = mc.Carte(carte, num)
       else :
-        message = "Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
-        #Afficher un message : pas sauvegardes
+        message = u"Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
 
-      pyglet.text.Label(message).draw() #Texte à changer
+    pyglet.text.Label(message, x = 20, y = self.window.height  - 30, width= 1000, multiline = True).draw() #Texte à changer
+    #pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [(0,0),(0,self.window.width),(20,self.window.width),(20, 0)]*2), ('c4B', (0,0,0,255)))
+    pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x = 20, y = 20).draw()
 
-    else :
-      pass
-      #Afficher un message, pas de dossier de sauvegardes trouvé
 
   def run(self) :
-
     pyglet.app.run()
