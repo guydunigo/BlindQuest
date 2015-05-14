@@ -1,10 +1,10 @@
 #-*-coding:utf-8-*-
 
 # # # # # # # # # # # # # # # # #
-#				#
+#                               #
 #         Projet de MDD         #
 #                               #
-#       fichier : main.py	#
+#       fichier : main.py       #
 #                               #
 # # # # # # # # # # # # # # # # #
 

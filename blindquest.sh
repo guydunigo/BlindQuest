@@ -13,24 +13,24 @@ arg=$1
 fi
 
 case $arg in
-	""|-3|-3d|--python3|-d|--debug)
-		echo "
+  ""|-3|-3d|--python3|-d|--debug)
+    echo "
 
 [$(date) on $OSTYPE]
 
 " >> log/errors_py3.log
-		python3 ./src_3/main.py 2>> log/errors_py3.log
-	;;
-	-2|-2d|--python2)
-		echo "
+    python3 ./src_3/main.py 2>> log/errors_py3.log
+  ;;
+  -2|-2d|--python2)
+    echo "
 
 [$(date) on $OSTYPE]
 
 " >> log/errors_py2.log
-		python2 ./src_2/main.py 2>> log/errors_py2.log
-	;;
-	--install|-i)
-		echo "[Desktop Entry]
+    python2 ./src_2/main.py 2>> log/errors_py2.log
+  ;;
+  --install|-i)
+    echo "[Desktop Entry]
 Comment[fr]=
 Comment=
 Exec=sh ./blindquest.sh
@@ -46,34 +46,34 @@ Terminal=true
 TerminalOptions=
 Type=Application" > blindquest.desktop
 
-	;;
-	--map-editor|-m)
-		python3 ./scripts/editeur_cartes.py
-	;;
-	*)
-		echo "Jeu BlindQuest,
+  ;;
+  --map-editor|-m)
+    python3 ./scripts/editeur_cartes.py
+  ;;
+  *)
+    echo "Jeu BlindQuest,
 Un jeu d'aventure exclusivement basé sur du son
 
 COMMANDE :
-	./blindquest.sh [options]
+  ./blindquest.sh [options]
 
 OPTIONS :
-	--python2	-2	Utilise python2 pour exécuter le jeu.
-			-2d	Utilise python2 et affiche le fichier d'erreurs à la fin.
-	--python3	-3	Utilise python3 (par défaut) pour exécuter le jeu.
-	-d -3d --debug 		Utilise python3 et affiche le fichier d'erreurs à la fin.
- 	--install	-i	Crée un raccourci .desktop du jeu.
-	--map-editor	-m	Ouvre l'éditeur de carte.
-	--help		-h	Affiche cette aide.
+  --python2  -2  Utilise python2 pour exécuter le jeu.
+      -2d  Utilise python2 et affiche le fichier d'erreurs à la fin.
+  --python3  -3  Utilise python3 (par défaut) pour exécuter le jeu.
+  -d -3d --debug     Utilise python3 et affiche le fichier d'erreurs à la fin.
+   --install  -i  Crée un raccourci .desktop du jeu.
+  --map-editor  -m  Ouvre l'éditeur de carte.
+  --help    -h  Affiche cette aide.
 "
-	;;
+  ;;
 esac
 
 case $arg in
-	-d|-3d|--debug)
-		cat log/errors_py3.log 
-	;;
-	-2d)
-		cat log/errors_py2.log
-	;;
+  -d|-3d|--debug)
+    cat log/errors_py3.log 
+  ;;
+  -2d)
+    cat log/errors_py2.log
+  ;;
 esac

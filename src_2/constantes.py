@@ -1,11 +1,11 @@
 #-*-coding:utf-8-*-
 
 # # # # # # # # # # # # # # # # #
-#				#
-#	  Projet de MDD		#
-#				#
-#    fichier : constantes.py	#
-#				#
+#        #
+#    Projet de MDD    #
+#        #
+#    fichier : constantes.py  #
+#        #
 # # # # # # # # # # # # # # # # #
 
 #Définition des constantes
@@ -20,52 +20,52 @@ VIE = 10
 #Il est possible d'ajouter un type de monstre ou de case dangeureuse, etc les ajoutant dans les diverses catégories
 
 #Codes des cases (compris entre 0 et 99 compris) :
-PLAINE		= 0
-FORET		= 1
-CAVERNE		= 2
-EAU		= 3
-CHATEAU		= 4
-SENTIER		= 5
-PONT		= 6
-SABLE		= 7
-MONTAGNE	= 8
-FORETPROFONDE	= 9
-MONSTRE		= 10
-BOSS		= 11
-BOSS_FINAL	= 12
-BONUS		= 13
-MER		= 14
-ENTREECHATEAU	= 15
-BORDURE		= 97
-DEPART		= 98
-FIN		= 99
+PLAINE    = 0
+FORET    = 1
+CAVERNE    = 2
+EAU    = 3
+CHATEAU    = 4
+SENTIER    = 5
+PONT    = 6
+SABLE    = 7
+MONTAGNE  = 8
+FORETPROFONDE  = 9
+MONSTRE    = 10
+BOSS    = 11
+BOSS_FINAL  = 12
+BONUS    = 13
+MER    = 14
+ENTREECHATEAU  = 15
+BORDURE    = 97
+DEPART    = 98
+FIN    = 99
 
 #Dictionnaire de conversion code de case -> nom du fichier son au format wav :
 
 CONV = {
-	PLAINE		: "plaine",
-	FORET		: "foret",
-	CAVERNE		: "caverne",
-	EAU		: "eau",
-	CHATEAU		: "chateau",
-	SENTIER		: "sentier",
-	PONT		: "pont",
-	SABLE		: "sable",
-	FORETPROFONDE	: "foretprofonde",
-	MONSTRE		: "monstre",
-	BOSS		: "boss",
-	BOSS_FINAL	: "boss_final",
-	BONUS		: "bonus",
-	MER		: "mer",
-	ENTREECHATEAU	: "entreechateau",
-	DEPART		: "depart",
-	FIN		: "fin"
+  PLAINE    : "plaine",
+  FORET    : "foret",
+  CAVERNE    : "caverne",
+  EAU    : "eau",
+  CHATEAU    : "chateau",
+  SENTIER    : "sentier",
+  PONT    : "pont",
+  SABLE    : "sable",
+  FORETPROFONDE  : "foretprofonde",
+  MONSTRE    : "monstre",
+  BOSS    : "boss",
+  BOSS_FINAL  : "boss_final",
+  BONUS    : "bonus",
+  MER    : "mer",
+  ENTREECHATEAU  : "entreechateau",
+  DEPART    : "depart",
+  FIN    : "fin"
 }
 
 #Liste (pour python c'est un tuple) de types impraticables (où le joueur ne peut aller) :
 NOGO = (
-	MONTAGNE,
-	BORDURE
+  MONTAGNE,
+  BORDURE
 )
 
 #Dictionnaire des types à détecter et de leur code de proximité assigné.
@@ -73,28 +73,28 @@ NOGO = (
 #Ce sont des puissances de 2 pour pouvoir jouer avec les opérateurs bits à bits :
 
 PROX = {
-	EAU	: 2** 0,
-	MER	: 2** 1,
-	PONT	: 2** 2
+  EAU  : 2** 0,
+  MER  : 2** 1,
+  PONT  : 2** 2
 }
 
 #Types de fins, les fichiers sons associés doivent exister et porter le même nom que la châine de caractère.
 
-VICTOIRE	= "victoire"
-NOYADE 		= "noyade"
-COMBAT		= "combat"
+VICTOIRE  = "victoire"
+NOYADE     = "noyade"
+COMBAT    = "combat"
 
 #Dictionnaire décrivant les différents types de cases démarrant un combat ainsi que les caractéristiques de l'attaquant sous la forme (vie, dégats)
 
 COMBAT = {
-	MONSTRE		: (1, 1),
-	BOSS		: (2, 2),
-	BOSS_FINAL	: (3, 3)
+  MONSTRE    : (1, 1),
+  BOSS    : (2, 2),
+  BOSS_FINAL  : (3, 3)
 }
 
 #Dictionnaire décrivant les différents environnements dangereux, où la mort est instantannée, ainsi que les morts associées:
 
 DANGER = {
-	EAU : NOYADE,
-	MER : NOYADE
+  EAU : NOYADE,
+  MER : NOYADE
 }
