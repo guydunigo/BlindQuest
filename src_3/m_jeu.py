@@ -220,19 +220,25 @@ class Jeu (object) :
 
     @self.window.event
     def on_draw() :
-      """On efface l'écran, peut-être sera-t-il impossible de voir l'aide : dans ce cas, l'enlever et regarder quand la touche est relachée."""
+      """Méthode qui affiche les différentes informations selon l'état du jeu."""
+      #On efface d'abord l'écran :
       self.window.clear()
+      #Au début, on affiche l'aide et on demande d'appuyer sur 'ESPACE' pour commencer :
       if self.state == "debut" :
         #On affiche l'aide :
         self.afficher_aide()
         #On affiche le message de bienvenue :
         pyglet.text.Label(u"Appuyez sur la touche ESPACE pour commencer...", x = 20, y = 20).draw()
+      #Si on est en pause, on l'indique :
       elif self.paused != [] :
         pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x = 20, y = 20).draw()
+      #Affichage de l'aide :
       if 'H' in self.state :
         self.afficher_aide()
+      #On indique que l'on est en train de sauvegarder :
       if 'S' in self.state :
         pyglet.text.Label("Sauvegarde en cours...", x = 20, y = 20).draw()
+      #On affiche la liste des sauvegardes et l'entrée utilisateur :
       elif 'C' in self.state :
         self.afficher_load()
 
@@ -241,11 +247,8 @@ class Jeu (object) :
     """Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si 
 environnement dangereux, combat...) et lance les sons d'environnement et de 
 proximité.
-      - direction : prend un chaîne de caractère parmis ("OUEST", "EST", 
-"NORD", 
-"SUD"). 
-          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, 
-ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+      - direction : prend un chaîne de caractère parmi ("OUEST", "EST", "NORD", "SUD"). 
+          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
 
     #On déplace le joueur su la carte et on récupère le code de la case d'arrivée. 
     case = self.carte.move(direction)
@@ -296,12 +299,12 @@ ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
 
   def fin(self, type_fin) :
     """Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
-      - type : chaîne de caractère décrivant la fin parmis celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
+      - type : chaîne de caractère décrivant la fin parmi celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
     #On restitue le sons associé à la mort :
     self.sons[type_fin].play()
 
-    #On active l'état fin qui empèche de se déplacer et de sauvegarder : :
+    #On active l'état fin qui empêche de se déplacer et de sauvegarder : :
     self.state = "fin"
 
 
@@ -330,11 +333,13 @@ ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
 
   def load(self) :
     """Charge une partie/Active le mode chargement."""
+    self.sate = self.state.replace('C','')
     pass
 
 
   def afficher_load(self) :
-    """Demande de choisir une sauvegarde et affiche les possibilités."""
+    """Demande de choisir une sauvegarde et affiche les possibilités.
+    - Ajouter un affichage en 2 colonnes."""
     if "saves" in os.listdir('.') :
       liste_sauv = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
       if liste_sauv != [] :
@@ -348,7 +353,7 @@ ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
         message = u"Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
 
     pyglet.text.Label(message, x = 20, y = self.window.height  - 30, width= 1000, multiline = True).draw() #Texte à changer
-    #pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [(0,0),(0,self.window.width),(20,self.window.width),(20, 0)]*2), ('c4B', (0,0,0,255)))
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0,0,self.window.width,0,self.window.width,47,0,47]), ('c4B', (0,0,0,255)*4))
     pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x = 20, y = 20).draw()
 
 
