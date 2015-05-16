@@ -190,26 +190,30 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
 
   def detect_prox(self) :
-    """Renvoie un entier composé au maximum de 4 puissances de 2 différentes aditionnées pour l'utilisation de l'opérateur bit à bit."""
+    """Renvoie un entier composé au maximum de 4 puissances de 2 différentes additionnées pour l'utilisation de l'opérateur bit à bit."""
     #Initialisation de la variable qui sera retournée :
     detect = 0
     #On regarde si les différents types qui doivent être détectés sont à proximité : 
     for prox in cs.PROX :
       #NORD :
-      if self.posy > 0 :
-        if self.carte[self.posy - 1][self.posx] == prox :
-          detect |= cs.PROX[prox]
+      if self.carte[self.posy - 1][self.posx] == prox :
+        detect |= cs.PROX[prox]
       #SUD :
       if self.posy < self.nb_lignes -  1 :
         if self.carte[self.posy + 1][self.posx] == prox :
           detect |= cs.PROX[prox]
-      #OUEST :
-      if self.posx > 0 :
-        if self.carte[self.posy][self.posx - 1] == prox :
+      else :
+        if self.carte[0][self.posx] == prox :
           detect |= cs.PROX[prox]
+      #OUEST :
+      if self.carte[self.posy][self.posx - 1] == prox :
+        detect |= cs.PROX[prox]
       #EST :
       if self.posx < self.nb_colonnes - 1 :
         if self.carte[self.posy][self.posx + 1] == prox :
+          detect |= cs.PROX[prox]
+      else :
+        if self.carte[self.posy][0] == prox :
           detect |= cs.PROX[prox]
 
     return detect

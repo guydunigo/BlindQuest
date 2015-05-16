@@ -162,6 +162,7 @@ class Jeu (object) :
       #Charger
       elif symbol == pyglet.window.key.C and "C" not in self.state :
         self.state += "C"
+        self.num_sauv = ''
 
       #En cas de chargement :
       if "C" in self.state :
@@ -332,9 +333,16 @@ proximité.
 
 
   def load(self) :
-    """Charge une partie/Active le mode chargement."""
-    self.sate = self.state.replace('C','')
-    pass
+    """Charge une partie en utilisant l'attribut num_sauv, si c'est une chaîne vide, on utilise la dernière sauvegarde."""
+    #Si la chaîne est vide :
+    liste_saves = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
+    if int(self.num_sauv) < len(liste_saves) :
+      sauv = 21
+    else :
+      print("Il n'existe pas de fichier à ce numéro.")
+      pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0,0,self.window.width,0,self.window.width,47,0,47]), ('c4B', (0,0,0,255)*4))
+      pyglet.text.Label("Il n'existe pas de sauvegarde à ce numéro.", x = 20, y = 20, color = (255,0,0,255))
+    self.state = self.state.replace('C','')
 
 
   def afficher_load(self) :
