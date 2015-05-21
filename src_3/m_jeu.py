@@ -11,6 +11,7 @@
 # Importation des modules fournis avec python :
 import time
 import os
+import random
 # Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 
 import pyglet
@@ -201,7 +202,7 @@ class Jeu (object):
             # Durant un combat :
             elif self.state == "combat":
                 if symbol == pyglet.window.key.A:  # À changer.
-                    pass
+                    self.tour_combat()
             # Au début :
             elif self.state == "debut" and symbol == pyglet.window.key.SPACE:
                 self.state = "normal"
@@ -269,6 +270,8 @@ class Jeu (object):
             # Si le joueur arrive sur une case létale, on active la fin.
             if case in cs.DANGER:
                 self.fin(cs.DANGER[case])
+            if case in cs.COMBAT_START:
+                pass
 
             # Restitution de l'environnement actuel :
             # Si la source est déjà active, on la remet au début.

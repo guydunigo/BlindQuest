@@ -19,8 +19,9 @@ class Carte (object):
     """Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
     def __init__(self, type_carte="defaut", num_sauv=None):
-        """Constructeur : Charge la carte dans une liste de liste (attribut carte) et définit la position par défaut du joueur (attributs posx et posy).
-      carte_type : Nom de la carte
+        """Constructeur : Charge la carte dans une liste de listes (attribut carte) et définit la position par défaut du joueur (attributs posx et posy), et stocke le nom de la carte (attribut type_carte).
+   - Arguments :
+      carte_type : Nom de la carte utilisée
       num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la sauvegarde à charger.
      """
 
@@ -125,7 +126,7 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def get_player_info(self):
         """Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme [posx, posy, vie, bonus...].
-    Cette méthode stocke cette liste sans les information concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
+    Cette méthode stocke cette liste sans les informations concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
 
         # On récupère la dernière ligne :
         self.player_info = self.carte[-1]
@@ -156,18 +157,19 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
             j += 1
 
         # Si la valeur de départ n'est pas trouvée, on lève une erreur de valeur (ça paraît logique) :
-        # Plus sérieusement, le type d'erreur levée pourra être changé.
         if not found:
-            raise ValueError("Aucune case de départ (codée {}) n'a été trouvé sur la carte.".format(cs.DEPART))
+            raise ValueError("Aucune case de départ (codée {}) n'a été trouvée sur la carte.".format(cs.DEPART))
 
     def move(self, direction=None):
         """Fonction qui déplace le joueur et renvoie le code de la case d'arrivée du joueur.
-      - direction : prend un chaîne de caractère parmi ("OUEST", "EST", "NORD", "SUD").
-          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+        direction : prend un chaîne de caractère parmi ("OUEST", "EST", "NORD", "SUD").
+          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas.
+        Quand le joueur ne bouge pas, on revoie None."""
 
         # On copie les coordonnées du joueur avant le déplacement :
         x, y = self.posx, self.posy
 
+        # On bouge le joueur en fonction de la direction choisie :
         if direction == "NORD":
             self.posy -= 1
         elif direction == "SUD":
@@ -185,7 +187,8 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
         return self.carte[self.posy][self.posx] + self.detect_prox() * 100
 
     def detect_prox(self):
-        """Renvoie un entier composé au maximum de 4 puissances de 2 différentes additionnées pour l'utilisation de l'opérateur bit à bit."""
+        """Renvoie un entier composé au maximum de 4 (pour les point cardinaux) puissances de 2 différentes additionnées pour l'utilisation de l'opérateur bit à bit."""
+
         # Initialisation de la variable qui sera retournée :
         detect = 0
         # On regarde si les différents types qui doivent être détectés sont à proximité :
@@ -215,13 +218,15 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def empty(self):
         """Méthode qui affecte à la case actuelle la valeur de la case à l'ouest si elle existe et si ce n'est pas la case départ, bonus, ou de combat ou une case où le joueur ne peut aller, sinon à l'est, au nord et enfin au sud.
-    Si aucune des cases environnantes ne correspond, on utilise la plaine.
-    Renvoie le code de la case actuelle.
+    Si aucune des cases environnantes n'est utilisable, on utilise la plaine.
+    Renvoie le code de la nouvelle case actuelle.
     Par exemple : après avoir récupéré un bonus ou après avoir tué un monstre."""
 
         redefinie = False
 
+	# On parcoure les cases aux points cardinaux :
         for x, y in [(self.posx - 1, self.posy), (self.posx + 1, self.posy), (self.posx, self.posy - 1), (self.posx, self.posy + 1)]:
+            #Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
             if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.carte[y][x] not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.carte[y][x] not in cs.COMBAT_START:
                 # On affecte la nouvelle valeur :
                 self.carte[self.posy][self.posx] = self.carte[y][x]
@@ -237,9 +242,14 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
         return self.carte[self.posy][self.posx] + self.detect_prox() * 100
 
     def save(self, player_info):
+        """Sauvegarde dans un fichier la carte et les informations du joueur (position, vie, ...)
+Sauvegarde dans le fichier de sauvegarde nommé sous la forme : "typeCarte_num.txt" dans le dossier saves s'il existe, sinon il sera créé.
+(player_info : une liste contenant la vie et d'autres informations concernant du joueur)"""
+
         sauv = self.carte
         sauv.append([self.posx, self.posy] + player_info)
 
+        # Si il n'existe pas de dossier saves, on en crée un :
         if "saves" not in os.listdir():
             os.mkdir("saves")
             num_sauv = "0"
