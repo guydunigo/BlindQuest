@@ -20,7 +20,7 @@ class Carte (object):
 
     def __init__(self, type_carte="defaut", num_sauv=None):
         """Constructeur : Charge la carte dans une liste de listes (attribut carte) et définit la position par défaut du joueur (attributs posx et posy), et stocke le nom de la carte (attribut type_carte).
-   - Arguments :
+        - Arguments :
       carte_type : Nom de la carte utilisée
       num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la sauvegarde à charger.
      """
@@ -50,8 +50,8 @@ class Carte (object):
 
     def _set_posx(self, new_posx):
         """Mutateur de l'attribut posx.
-Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
-Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
+        Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
+        Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
         if new_posx < 0:
             new_posx = self.nb_colonnes + new_posx
         elif new_posx >= self.nb_colonnes:
@@ -69,8 +69,8 @@ Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def _set_posy(self, new_posy):
         """Mutateur de l'attribut posy.
-Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
-Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
+        Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
+        Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
         if new_posy < 0:
             new_posy = self.nb_lignes + new_posy
         elif new_posy >= self.nb_lignes:
@@ -78,12 +78,13 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
         else:
             if self.carte[new_posy][self.posx] not in cs.NOGO:
                 self._posy = new_posy
+
     posy = property(_get_posy, _set_posy)
 
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
-    Une erreur est levée si le dossier ou le fichier n'existe pas.
-    Ne pas oublier d'utiliser la méthode get_player_info si on charge une sauvegarde."""
+        Une erreur est levée si le dossier ou le fichier n'existe pas.
+        Ne pas oublier d'utiliser la méthode get_player_info si on charge une sauvegarde."""
 
         if dossier in os.listdir('.') and str(nom_fichier) + ".txt" in os.listdir(dossier):
             with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte:
@@ -126,7 +127,7 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def get_player_info(self):
         """Lors du chargement d'une sauvegarde, la dernière ligne de la liste carte est une liste d'informations du joueur sous la forme [posx, posy, vie, bonus...].
-    Cette méthode stocke cette liste sans les informations concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
+        Cette méthode stocke cette liste sans les informations concernant la position du joueur qui sont, elles, rangées dans leur attribut correspondant."""
 
         # On récupère la dernière ligne :
         self.player_info = self.carte[-1]
@@ -218,15 +219,15 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def empty(self):
         """Méthode qui affecte à la case actuelle la valeur de la case à l'ouest si elle existe et si ce n'est pas la case départ, bonus, ou de combat ou une case où le joueur ne peut aller, sinon à l'est, au nord et enfin au sud.
-    Si aucune des cases environnantes n'est utilisable, on utilise la plaine.
-    Renvoie le code de la nouvelle case actuelle.
-    Par exemple : après avoir récupéré un bonus ou après avoir tué un monstre."""
+        Si aucune des cases environnantes n'est utilisable, on utilise la plaine.
+        Renvoie le code de la nouvelle case actuelle.
+        Par exemple : après avoir récupéré un bonus ou après avoir tué un monstre."""
 
         redefinie = False
 
-	# On parcoure les cases aux points cardinaux :
+        # On parcoure les cases aux points cardinaux :
         for x, y in [(self.posx - 1, self.posy), (self.posx + 1, self.posy), (self.posx, self.posy - 1), (self.posx, self.posy + 1)]:
-            #Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
+            # Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
             if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.carte[y][x] not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.carte[y][x] not in cs.COMBAT_START:
                 # On affecte la nouvelle valeur :
                 self.carte[self.posy][self.posx] = self.carte[y][x]
@@ -243,8 +244,8 @@ Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
 
     def save(self, player_info):
         """Sauvegarde dans un fichier la carte et les informations du joueur (position, vie, ...)
-Sauvegarde dans le fichier de sauvegarde nommé sous la forme : "typeCarte_num.txt" dans le dossier saves s'il existe, sinon il sera créé.
-(player_info : une liste contenant la vie et d'autres informations concernant du joueur)"""
+        Sauvegarde dans le fichier de sauvegarde nommé sous la forme : "typeCarte_num.txt" dans le dossier saves s'il existe, sinon il sera créé.
+        (player_info : une liste contenant la vie et d'autres informations concernant du joueur)"""
 
         sauv = self.carte
         sauv.append([self.posx, self.posy] + player_info)

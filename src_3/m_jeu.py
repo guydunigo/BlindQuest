@@ -12,8 +12,8 @@
 import time
 import os
 import random
-# Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 
+# Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 import pyglet
 print("Utilisation de la version de pyglet du dossier src/ (", pyglet.version, ").")
 print()
@@ -41,7 +41,7 @@ class Jeu (object):
         pyglet.resource.path = [os.path.join(working_dir, '..')]
         pyglet.resource.reindex()
 
-        # On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas)
+        # On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas (segfaults))
         pyglet.options['audio'] = ('openal', )
 
         # Chargement de la carte :
@@ -50,7 +50,7 @@ class Jeu (object):
         self.charger_sons()
         # Lecteurs (environnement(s), action(s), heartbeats,...) :
         self.creer_lecteurs()
-        # Fenêtre (activation du plein écran ?par défaut?) :
+        # Fenêtre (activation du plein écran par défaut) :
         self.creer_fenetre()
         # Création des événements :
         self.init_events()
@@ -58,9 +58,9 @@ class Jeu (object):
         # Initialisation de la vie du personnage
         self.vie = cs.VIE
 
-        # Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde :
+        # Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde et P lors de la mise ne pause :
         self.state = "debut"
-        # Initialisation du numéro de sauvegarde chargé :
+        # Initialisation du numéro de sauvegarde qui sera chargée :
         self.num_sauv = ""
         # Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
         self.paused = []
@@ -94,22 +94,20 @@ class Jeu (object):
       - env : Pour l'environnement ou le combat, en boucle.
       - heartbeat : Si il ne reste qu'une vie, on entend un battement de cœur, en boucle.
       - Les différents sons de proximité ont leur propre lecteur, en boucle.
-      - Monstre : peut-être inutile, bruit du monstre de temps en temps.
     """
 
         self.lecteurs = {}
-        for lecteur in ("env", "monstre", "heartbeat"):
+        for lecteur in ("env", "heartbeat"):
             self.lecteurs[lecteur] = pyglet.media.Player()
+            # En boucle
+            self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
             if lecteur == "env":
-                # En boucle
-                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
                 self.lecteurs[lecteur].volume = 0.7
             if lecteur == "heartbeat":
-                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
                 self.lecteurs[lecteur].queue(self.sons[lecteur])
                 self.lecteurs[lecteur].volume = 1.0
 
-        # Création des lecteurs pour les sons de proximité, un lecteur par sons, en boucle, volume faible.
+        # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
         for lecteur in cs.PROX:
             self.lecteurs[lecteur] = pyglet.media.Player()
             self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
@@ -219,6 +217,7 @@ class Jeu (object):
         @self.window.event
         def on_draw():
             """Méthode qui affiche les différentes informations selon l'état du jeu."""
+
             # On efface d'abord l'écran :
             self.window.clear()
             # Au début, on affiche l'aide et on demande d'appuyer sur 'ESPACE' pour commencer :
@@ -243,40 +242,43 @@ class Jeu (object):
     def move(self, direction=None):
         """Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
       - direction : prend un chaîne de caractère parmi ("OUEST", "EST", "NORD", "SUD").
-          Si il n'est pas définit (ou à None du coups), le joueur ne bouge pas, ce qui est utile pour avoir l'environnement sonore actuel du joueur."""
+          Si il n'est pas définit (ou à None), le joueur ne bouge pas."""
 
-        # On déplace le joueur su la carte et on récupère le code de la case d'arrivée.
+        # On déplace le joueur su la carte et on récupère le code de la case d'arrivée :
         case = self.carte.move(direction)
 
         if case is not None:
-            # On récupère les informations de proximité de la case (eau, pont...), qui sont écrits sous forme de centaines et au dessus.
+            # On récupère les informations de proximité de la case (eau, pont...), qui sont écrites sous forme de mot binaire à partir des centaines :
             infos_prox = int(case / 100)
             case = case - infos_prox * 100
 
+            # Si le joueur arrive sur une case létale, on active à la fin.
+            if case in cs.DANGER:
+                self.fin(cs.DANGER[case])
             # Si on arrive sur une case bonus, le joueur reprend toute sa vie et on entend le jingle associé :
-            while case == cs.BONUS:
+            elif case == cs.BONUS:
                 # On joue le jingle :
                 self.sons[cs.CONV[cs.BONUS]].play()
                 # On remet la vie du joueur au maximum :
                 self.vie = cs.VIE
                 # On vide la case et on récupère le nouveau type d'environnement :
                 case = self.carte.empty()
-                # On met à jour les valeurs de case et e proximité :
+                # On met à jour les valeurs de case et de proximité :
                 infos_prox = int(case / 100)
                 case = case - infos_prox * 100
+            # Si on arrive sur une case combat, on passe en mode combat, ... :
+            elif case in cs.COMBAT_START:
+                self.combat_init()
 
             print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
 
-            # Si le joueur arrive sur une case létale, on active la fin.
-            if case in cs.DANGER:
-                self.fin(cs.DANGER[case])
-            if case in cs.COMBAT_START:
-                pass
-
             # Restitution de l'environnement actuel :
-            # Si la source est déjà active, on la remet au début.
-            if self.lecteurs["env"].source == self.sons[cs.CONV[case]]:
+            # Si la source est déjà active, on la remet au début :
+            if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[i] for i in cs.COMBAT_START]:
                 self.lecteurs["env"].seek(0)
+            elif case in cs.COMBAT_START :
+                self.lecteurs["env"].queue(self.sons[cs.COMBAT])
+                self.lecteurs["env"].next_source()
             else:
                 self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
                 self.lecteurs["env"].next_source()
@@ -355,5 +357,15 @@ class Jeu (object):
         pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0, 0, self.window.width, 0, self.window.width, 47, 0, 47]), ('c4B', (0, 0, 0, 255) * 4))
         pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x=20, y=20).draw()
 
+    def combat_init(self):
+        pass
+
+    def tour_combat(self):
+        pass
+
+    def attaque(self):
+        pass
+
     def run(self):
+        """Lance la boucle de simulation pyglet."""
         pyglet.app.run()
