@@ -253,11 +253,13 @@ Sauvegarde dans le fichier de sauvegarde nommé sous la forme : "typeCarte_num.t
         if "saves" not in os.listdir():
             os.mkdir("saves")
             num_sauv = "0"
+        # Sinon on recherche les sauvegardes existantes de la carte utilisée et on prend le numéro directement supérieur :
         else:
             list_sauv = [i.replace(self.type_carte + '_', '').replace(".txt", '') for i in os.listdir("saves") if self.type_carte in i] + ['0']
             list_sauv.sort()
             num_sauv = str(int(list_sauv[-1]) + 1)
 
+        # On écrit dans le fichier :
         with open("saves/{}.txt".format(self.type_carte + "_" + num_sauv), 'w') as fichier:
             for i in sauv:
                 for j in i:
