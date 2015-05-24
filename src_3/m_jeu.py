@@ -276,6 +276,8 @@ class Jeu (object):
             # Si le joueur arrive sur une case létale, on active à la fin.
             if case in cs.DANGER:
                 self.fin(cs.DANGER[case])
+                # On renvoie None pour arrêter la fonction là :
+                return None
             # Si on arrive sur une case bonus, le joueur reprend toute sa vie et on entend le jingle associé :
             elif case == cs.BONUS:
                 # On joue le jingle :
@@ -323,8 +325,14 @@ class Jeu (object):
 
         # On restitue le sons associé à la mort :
         self.lecteurs["env"].eos_action = self.lecteurs["env"].EOS_STOP
-        self.lecteurs["env"].queue(self.sons[type_fin])
         self.lecteurs["env"].next()
+        self.lecteurs["env"].next()
+        self.lecteurs["env"].queue(self.sons[type_fin])
+        self.lecteurs["env"].play()
+
+        # On met en pause les lecteurs de proximité :
+        for i in cs.PROX:
+            self.lecteurs[i].pause()
 
         # On active l'état fin qui empêche de se déplacer et de sauvegarder : :
         self.state = "fin"
@@ -433,6 +441,7 @@ class Jeu (object):
             else:
                 del self.vie_monstre
                 del self.degats_monstre
+                self.state = "normal"
 
     def attaque(self, proba):
         """ Fonction qui permet d'attaquer, proba étant un nombre entier """
