@@ -56,7 +56,7 @@ class Jeu (object):
         self.init_events()
 
         # Initialisation de la vie du personnage
-        self.vie = cs.VIE
+        self._vie = cs.VIE
 
         # Initialisation de variables d'état ("debut", "combat", "normal") accompagné d'un H lorsque l'on affiche l'aide, C lors d'un chargement ou de S lors d'une sauvegarde et P lors de la mise ne pause :
         self.state = "debut"
@@ -64,6 +64,28 @@ class Jeu (object):
         self.num_sauv = ""
         # Initialisation de la liste des lecteurs en pause (par extension, indique si le jeu est en pause lorsqu'elle est vide) :
         self.paused = []
+
+    # Encapsulation pour la vie du joueur :
+    def _get_vie(self):
+        """Accesseur de l'attribut vie"""
+        return self._vie
+
+    def _set_vie(self, new_vie):
+        """Mutateur de l'attribut vie.
+        Si la nouvelle valeur est inférieure ou égale à 3, on déclenche les battements de cœur pour avertir le joueur."""
+        if new_vie > 0:
+            self._vie = new_vie
+        else:
+            self._vie = 0
+
+        if new_vie <= 3:
+            self.lecteurs["heartbeat"].play()
+            self.lecteurs["env"].volume = 0.3
+        else:
+            self.lecteurs["heartbeat"].pause()
+            self.lecteurs["env"].volume = 0.5
+
+    vie = property(_get_vie, _set_vie)
 
     def charger_sons(self):
         """Charge tous les sons du dossier 'sons' et les range dans un dictionnaire avec pour étiquette le nom du fichier son sans l'extension '.wav'.
@@ -105,7 +127,7 @@ class Jeu (object):
                 self.lecteurs[lecteur].volume = 0.7
             if lecteur == "heartbeat":
                 self.lecteurs[lecteur].queue(self.sons[lecteur])
-                self.lecteurs[lecteur].volume = 1.0
+                self.lecteurs[lecteur].volume = 3.0
 
         # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
         for lecteur in cs.PROX:
@@ -207,7 +229,6 @@ class Jeu (object):
 
         @self.window.event
         def on_key_release(symbol, modifiers):
-            print(self.state)
             if 'H' in self.state:
                 self.state = self.state.replace('H', '')
             if 'S' in self.state:
@@ -274,9 +295,9 @@ class Jeu (object):
 
             # Restitution de l'environnement actuel :
             # Si la source est déjà active, on la remet au début :
-            if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[i] for i in cs.COMBAT_START]:
+            if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
                 self.lecteurs["env"].seek(0)
-            elif case in cs.COMBAT_START :
+            elif case in cs.COMBAT_START:
                 self.lecteurs["env"].queue(self.sons[cs.COMBAT])
                 self.lecteurs["env"].next_source()
             else:
@@ -299,7 +320,9 @@ class Jeu (object):
       - type : chaîne de caractère décrivant la fin parmi celles se trouvant dans le fichier constantes, les fichiers sons associés doivent exister."""
 
         # On restitue le sons associé à la mort :
-        self.sons[type_fin].play()
+        self.lecteurs["env"].eos_action = self.lecteurs["env"].EOS_STOP
+        self.lecteurs["env"].queue(self.sons[type_fin])
+        self.lecteurs["env"].next()
 
         # On active l'état fin qui empêche de se déplacer et de sauvegarder : :
         self.state = "fin"
@@ -357,49 +380,65 @@ class Jeu (object):
         pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0, 0, self.window.width, 0, self.window.width, 47, 0, 47]), ('c4B', (0, 0, 0, 255) * 4))
         pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x=20, y=20).draw()
 
-    def attaque (self, proba):
-	""" Fonction qui permet d'attaquer, proba étant un nombre entier """
-	alea = random.randint(1,100)
-	#proba est la probabilité de réussite d'une attaque
-	if alea <= proba :
-		return 1
-	else :
-		return 0
-	
-    def combat_init (self) :
-	""" Fonction qui initialise les combats """
-	self.state = "combat"
-	
-	# en fonction de pos x et pos y, récupère le type de monstre
-	monstre = self.carte.carte[self.carte.posy][self.carte.posx]
-	#on récupère la vie du monstre
-	self.vie_monstre = cs.COMBAT_START[monstre][0]
-	#et son nombre de dégâts
-	self.degats_monstre = cs.COMBAT_START[monstre][1]
-		
-    def tour_combat (self) :
-	""" Fonction qui gère le tour du combat : attaque du joueur et attaque du monstre """
-	#attaque du joueur
-	self.vie_monstre -= attaque(70)
-		
-	#si on ne l'a pas tué, il réplique
-	if self.vie_monstre > 0 :
-		self.vie -= self.degats_monstre*attaque (50)
-			
-		#si on est mort, fin du jeu
-		if self.vie <= 0 :
-			self.fin(cs.COMBAT)	
-				
-	#si on a vaincu le monstre
-	if self.vie_monstre <= 0 :
-		# et que c'était le boss final : fin du jeu
-		if 	self.carte.carte[self.carte.posy][self.carte.posx] == cs.BOSS_FINAL	:
-			self.fin(cs.VICTOIRE)
-		# sinon : on continue la partie
-		else :
-			del self.vie_monstre
-			del self.degats_monstre
-				
+    def combat_init(self):
+        """ Fonction qui initialise les combats """
+
+        self.state = "combat"
+
+        # En fonction de pos x et pos y, récupère le type de monstre
+        monstre = self.carte.carte[self.carte.posy][self.carte.posx]
+        # On récupère la vie du monstre
+        self.vie_monstre = cs.COMBAT_START[monstre][0]
+        # Et son nombre de dégâts
+        self.degats_monstre = cs.COMBAT_START[monstre][1]
+
+    def tour_combat(self):
+        """ Fonction qui gère le tour du combat : attaque du joueur et attaque du monstre """
+
+        # Attaque du joueur
+        attaque = self.attaque(0)
+        self.vie_monstre -= attaque
+        # Si on fait des dégâts, on fait un son d'épée qui touche :
+        if attaque > 0:
+            self.sons[cs.EPEEHIT].play()
+        else:
+            self.sons[cs.EPEEMISSED].play()
+
+        # On attend un peu avant l'attaque du monstre :
+        time.sleep(.3)
+
+        # Si on ne l'a pas tué, il réplique
+        if self.vie_monstre > 0:
+            attaque = self.degats_monstre * self.attaque(50)
+            self.vie -= attaque
+            if attaque > 0:
+                self.sons[cs.JOUEURBLESSE].play()
+
+            # Si on est mort, fin du jeu
+            if self.vie <= 0:
+                self.fin(cs.MORTCOMBAT)
+
+        # Si on a vaincu le monstre
+        if self.vie_monstre <= 0:
+            # et que c'était le boss final : fin du jeu
+            if self.carte.carte[self.carte.posy][self.carte.posx] == cs.BOSS_FINAL:
+                self.fin(cs.VICTOIRE)
+            # Sinon : on continue la partie
+            else:
+                del self.vie_monstre
+                del self.degats_monstre
+
+    def attaque(self, proba):
+        """ Fonction qui permet d'attaquer, proba étant un nombre entier """
+
+        alea = random.randint(1, 100)
+        # proba est la probabilité de réussite d'une attaque
+        if alea <= proba:
+            return 1
+        else:
+            return 0
+
     def run(self):
         """Lance la boucle de simulation pyglet."""
+
         pyglet.app.run()

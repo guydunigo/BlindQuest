@@ -76,11 +76,18 @@ PROX = {
   PONT  : 2 ** 2 | 2 ** 0  # On veut entendre l'eau couler avec le bruit du pont pour mieux comprendre que c'est un pont.
 }
 
+# Sons de combat.
+
+EPEEHIT      = "epeehit"
+EPEEMISSED   = "epeemissed"
+JOUEURBLESSE = "joueurblesse"
+
 # Types de fins, les fichiers sons associés doivent exister et porter le même nom que la chaîne de caractère.
 
 VICTOIRE   = "victoire"
 NOYADE     = "noyade"
 COMBAT     = "combat"
+MORTCOMBAT = "mortcombat"
 
 # Dictionnaire décrivant les différents types de cases démarrant un combat ainsi que les caractéristiques de l'attaquant sous la forme (vie, dégâts)
 
