@@ -358,48 +358,47 @@ class Jeu (object):
         pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x=20, y=20).draw()
 
     def attaque (self, proba):
-		""" Fonction qui permet d'attaquer, proba étant un nombre entier """
-		alea = random.randint(1,100)
-		#proba est la probabilité de réussite d'une attaque
-		if alea <= proba :
-			return 1
-		else :
-			return 0
+	""" Fonction qui permet d'attaquer, proba étant un nombre entier """
+	alea = random.randint(1,100)
+	#proba est la probabilité de réussite d'une attaque
+	if alea <= proba :
+		return 1
+	else :
+		return 0
+	
+    def combat_init (self) :
+	""" Fonction qui initialise les combats """
+	self.state = "combat"
+	
+	# en fonction de pos x et pos y, récupère le type de monstre
+	monstre = self.carte.carte[self.carte.posy][self.carte.posx]
+	#on récupère la vie du monstre
+	self.vie_monstre = cs.COMBAT_START[monstre][0]
+	#et son nombre de dégâts
+	self.degats_monstre = cs.COMBAT_START[monstre][1]
+		
+    def tour_combat (self) :
+	""" Fonction qui gère le tour du combat : attaque du joueur et attaque du monstre """
+	#attaque du joueur
+	self.vie_monstre -= attaque(70)
+		
+	#si on ne l'a pas tué, il réplique
+	if self.vie_monstre > 0 :
+		self.vie -= self.degats_monstre*attaque (50)
 			
-	def combat_init (self) :
-		""" Fonction qui initialise les combats """
-		
-		self.state = "combat"
-		
-		# en fonction de pos x et pos y, récupère le type de monstre
-		monstre = self.carte.carte[self.carte.posy][self.carte.posx]
-		#on récupère la vie du monstre
-		self.vie_monstre = cs.COMBAT_START[monstre][0]
-		#et son nombre de dégâts
-		self.degats_monstre = cs.COMBAT_START[monstre][1]
-		
-	def tour_combat (self) :
-		""" Fonction qui gère le tour du combat : attaque du joueur et attaque du monstre """
-		#attaque du joueur
-		self.vie_monstre -= attaque(70)
-		
-		#si on ne l'a pas tué, il réplique
-		if self.vie_monstre > 0 :
-			self.vie -= self.degats_monstre*attaque (50)
-			
-			#si on est mort, fin du jeu
-			if self.vie <= 0 :
-				self.fin(cs.COMBAT)	
+		#si on est mort, fin du jeu
+		if self.vie <= 0 :
+			self.fin(cs.COMBAT)	
 				
-		#si on a vaincu le monstre
-		if self.vie_monstre <= 0 :
-			# et que c'était le boss final : fin du jeu
-			if 	self.carte.carte[self.carte.posy][self.carte.posx] == cs.BOSS_FINAL	:
-				self.fin(cs.VICTOIRE)
-			# sinon : on continue la partie
-			else :
-				del self.vie_monstre
-				del self.degats_monstre
+	#si on a vaincu le monstre
+	if self.vie_monstre <= 0 :
+		# et que c'était le boss final : fin du jeu
+		if 	self.carte.carte[self.carte.posy][self.carte.posx] == cs.BOSS_FINAL	:
+			self.fin(cs.VICTOIRE)
+		# sinon : on continue la partie
+		else :
+			del self.vie_monstre
+			del self.degats_monstre
 				
     def run(self):
         """Lance la boucle de simulation pyglet."""
