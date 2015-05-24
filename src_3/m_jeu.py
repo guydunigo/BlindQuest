@@ -83,7 +83,7 @@ class Jeu (object):
             self.lecteurs["env"].volume = 0.3
         else:
             self.lecteurs["heartbeat"].pause()
-            self.lecteurs["env"].volume = 0.5
+            self.lecteurs["env"].volume = 0.7
 
     vie = property(_get_vie, _set_vie)
 
@@ -128,6 +128,9 @@ class Jeu (object):
             if lecteur == "heartbeat":
                 self.lecteurs[lecteur].queue(self.sons[lecteur])
                 self.lecteurs[lecteur].volume = 3.0
+            #@self.lecteurs[lecteur].event
+            #def on_eos():
+                
 
         # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
         for lecteur in cs.PROX:
@@ -292,26 +295,30 @@ class Jeu (object):
             # Si on arrive sur une case combat, on passe en mode combat, ... :
             elif case in cs.COMBAT_START:
                 self.combat_init()
+        # Sinon on récupère les informations de la case actuelle :
+        else:
+            case = self.carte.case
+            infos_prox = self.carte.detect_prox()
 
-            print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
+        print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
 
-            # Restitution de l'environnement actuel :
-            # Si la source est déjà active, on la remet au début :
-            if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
-                self.lecteurs["env"].seek(0)
-            elif case in cs.COMBAT_START:
-                self.lecteurs["env"].queue(self.sons[cs.COMBAT])
-                self.lecteurs["env"].next_source()
+        # Restitution de l'environnement actuel :
+        # Si la source est déjà active, on la remet au début :
+        if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
+            self.lecteurs["env"].seek(0)
+        elif case in cs.COMBAT_START:
+            self.lecteurs["env"].queue(self.sons[cs.COMBAT])
+            self.lecteurs["env"].next_source()
+        else:
+            self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
+            self.lecteurs["env"].next_source()
+
+        # Détection des proximités et restitution du son associé :
+        for prox in cs.PROX:
+            if infos_prox & cs.PROX[prox] == cs.PROX[prox]:
+                self.lecteurs[prox].play()
             else:
-                self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
-                self.lecteurs["env"].next_source()
-
-            # Détection des proximités et restitution du son associé :
-            for prox in cs.PROX:
-                if infos_prox & cs.PROX[prox] == cs.PROX[prox]:
-                    self.lecteurs[prox].play()
-                else:
-                    self.lecteurs[prox].pause()
+                self.lecteurs[prox].pause()
 
     def afficher_aide(self):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
@@ -441,6 +448,10 @@ class Jeu (object):
             else:
                 del self.vie_monstre
                 del self.degats_monstre
+                # On vide la case et on récupère le nouveau type d'environnement :
+                self.carte.empty()
+                self.move()
+                # On passe l'état du jeu en normal :
                 self.state = "normal"
 
     def attaque(self, proba):

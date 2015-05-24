@@ -28,6 +28,8 @@ class Carte (object):
         # Initialisation de la position du joueur :
         self._posx = 0
         self._posy = 0
+        # Initialisation du type de case et des informations de proximité de la case du joueur :
+        self.case = cs.DEPART
         # On sauvegarde le nom de la carte :
         self.type_carte = type_carte
 
@@ -57,8 +59,11 @@ class Carte (object):
         elif new_posx >= self.nb_colonnes:
             new_posx -= self.nb_colonnes
         if new_posx >= 0 and new_posx < self.nb_colonnes:
-            if self.carte[self.posy][new_posx] not in cs.NOGO:
+            if self.case not in cs.NOGO:
                 self._posx = new_posx
+
+        # On met à jour les informations de case du joueur :
+        self.case = self.carte[self.posy][self.posx]
 
     posx = property(_get_posx, _set_posx)
 
@@ -76,10 +81,14 @@ class Carte (object):
         elif new_posy >= self.nb_lignes:
             new_posy -= self.nb_lignes
         else:
-            if self.carte[new_posy][self.posx] not in cs.NOGO:
+            if self.case not in cs.NOGO:
                 self._posy = new_posy
 
+        # On met à jour les informations de case du joueur :
+        self.case = self.carte[self.posy][self.posx]
+
     posy = property(_get_posy, _set_posy)
+
 
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
@@ -185,7 +194,7 @@ class Carte (object):
             return None
 
         # On renvoie le code de la case ainsi que, à partir des centaines, le code de proximité :
-        return self.carte[self.posy][self.posx] + self.detect_prox() * 100
+        return self.case + self.detect_prox() * 100
 
     def detect_prox(self):
         """Renvoie un entier composé au maximum de 4 (pour les point cardinaux) puissances de 2 différentes additionnées pour l'utilisation de l'opérateur bit à bit."""
