@@ -11,7 +11,7 @@
 # Définition des constantes
 
 # Carte utilisée :
-CARTE = "test"
+CARTE = "petite"
 
 # Quantité de vie du personnage :
 VIE = 10
@@ -105,3 +105,4 @@ DANGER = {
   EAU : NOYADE,
   MER : NOYADE
 }
+

@@ -260,7 +260,7 @@ class Jeu (object):
 
         # On déplace le joueur su la carte et on récupère le code de la case d'arrivée :
         case = self.carte.move(direction)
-        if direction is None or case is not None :
+        if direction is None or case is not None:
             if case is not None:
                 # On récupère les informations de proximité de la case (eau, pont...), qui sont écrites sous forme de mot binaire à partir des centaines :
                 infos_prox = int(case / 100)
@@ -314,7 +314,10 @@ class Jeu (object):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
 
         pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=210, width=self.window.width, multiline=True).draw()
-        pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\nP met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\nE permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\nEnfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=150, width=self.window.width, multiline=True).draw()
+        pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\n\
+P met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\n\
+E permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\n\
+Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=150, width=self.window.width, multiline=True).draw()
 
     def fin(self, type_fin):
         """Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
@@ -326,6 +329,9 @@ class Jeu (object):
         self.lecteurs["env"].next()
         self.lecteurs["env"].queue(self.sons[type_fin])
         self.lecteurs["env"].play()
+
+        # On arrête le heartbeat :
+        self.lecteurs["heartbeat"].pause()
 
         # On met en pause les lecteurs de proximité :
         for i in cs.PROX:
@@ -366,9 +372,6 @@ class Jeu (object):
             self.vie = self.carte.player_info[0]
             self.state = "debut"
             self.move()
-        else:
-            pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0, 0, self.window.width, 0, self.window.width, 47, 0, 47]), ('c4B', (0, 0, 0, 255) * 4))
-            pyglet.text.Label("Il n'existe pas de sauvegarde à ce numéro.", x=20, y=20, color=(255, 255, 255, 255)).draw()
         self.state = self.state.replace('C', '')
 
     def afficher_load(self):
@@ -388,7 +391,7 @@ class Jeu (object):
 
         pyglet.text.Label(message, x=20, y=self.window.height - 30, width=1000, multiline=True).draw()  # Texte à changer
         pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0, 0, self.window.width, 0, self.window.width, 47, 0, 47]), ('c4B', (0, 0, 0, 255) * 4))
-        pyglet.text.Label("Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x=20, y=20).draw()
+        pyglet.text.Label(u"Entrez le numéro correspondant à la sauvegarde choisie : {}".format(self.num_sauv), x=20, y=20).draw()
 
     def combat_init(self):
         """ Fonction qui initialise les combats """
