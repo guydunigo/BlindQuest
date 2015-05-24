@@ -221,7 +221,7 @@ class Jeu (object):
                     self.save()
             # Durant un combat :
             elif self.state == "combat":
-                if symbol == pyglet.window.key.A:  # À changer.
+                if symbol == pyglet.window.key.E:
                     self.tour_combat()
             # Au début :
             elif self.state == "debut" and symbol == pyglet.window.key.SPACE:
@@ -313,7 +313,9 @@ class Jeu (object):
 
     def afficher_aide(self):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
-        pyglet.text.Label("test de l'aide", x=20, y=200).draw()
+
+        pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=210, width=self.window.width, multiline=True).draw()
+        pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\nP met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\nE permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\nEnfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=150, width=self.window.width, multiline=True).draw()
 
     def fin(self, type_fin):
         """Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
@@ -396,22 +398,26 @@ class Jeu (object):
         """ Fonction qui gère le tour du combat : attaque du joueur et attaque du monstre """
 
         # Attaque du joueur
-        attaque = self.attaque(0)
+        attaque = self.attaque(70)
         self.vie_monstre -= attaque
         # Si on fait des dégâts, on fait un son d'épée qui touche :
         if attaque > 0:
             self.sons[cs.EPEEHIT].play()
+            time.sleep(.4)
+            self.sons[cs.MONSTREBLESSE].play()
         else:
             self.sons[cs.EPEEMISSED].play()
 
         # On attend un peu avant l'attaque du monstre :
-        time.sleep(.3)
+        time.sleep(.7)
 
         # Si on ne l'a pas tué, il réplique
         if self.vie_monstre > 0:
             attaque = self.degats_monstre * self.attaque(50)
             self.vie -= attaque
             if attaque > 0:
+                self.sons[cs.MARTEAUHIT].play()
+                time.sleep(.2)
                 self.sons[cs.JOUEURBLESSE].play()
 
             # Si on est mort, fin du jeu

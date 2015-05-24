@@ -78,9 +78,11 @@ PROX = {
 
 # Sons de combat.
 
-EPEEHIT      = "epeehit"
-EPEEMISSED   = "epeemissed"
-JOUEURBLESSE = "joueurblesse"
+EPEEHIT       = "epeehit"
+EPEEMISSED    = "epeemissed"
+MARTEAUHIT    = "marteauhit"
+JOUEURBLESSE  = "joueurblesse"
+MONSTREBLESSE = "monstreblesse"
 
 # Types de fins, les fichiers sons associés doivent exister et porter le même nom que la chaîne de caractère.
 
