@@ -15,8 +15,7 @@ import random
 
 # Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 import pyglet
-print("Utilisation de la version de pyglet du dossier src/ (", pyglet.version, ").")
-print()
+print("Utilisation de la version de pyglet du dossier src/ (", pyglet.version, ").\n")
 
 # Importation des constantes :
 import constantes as cs
@@ -33,8 +32,7 @@ class Jeu (object):
 
         # Si le dossier de travail de python (le dossier depuis lequel python a été lancé) est le dossier du code source ('src_3'), on va dans le dossier principal.
         if "/src_3" in os.getcwd()[-6:]:
-            print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).")
-            print()
+            print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).\n")
             os.chdir("../")
         # Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
         working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -128,25 +126,17 @@ class Jeu (object):
             if lecteur == "heartbeat":
                 self.lecteurs[lecteur].queue(self.sons[lecteur])
                 self.lecteurs[lecteur].volume = 3.0
-            #@self.lecteurs[lecteur].event
-            #def on_eos():
-                
 
         # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
         for lecteur in cs.PROX:
             self.lecteurs[lecteur] = pyglet.media.Player()
             self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
             self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-            self.lecteurs[lecteur].volume = 0.5
+            self.lecteurs[lecteur].volume = 0.7
 
         # On restitue l'environnement sonore de départ.
         self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
         self.lecteurs["env"].play()
-
-        # Affichage des volumes des différents lecteurs :
-        print("   Volume des lecteurs :")
-        for i in self.lecteurs:
-            print("    - ", i, " : ", self.lecteurs[i].volume)
 
     def creer_fenetre(self):
         """Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
@@ -403,7 +393,7 @@ class Jeu (object):
         self.state = "combat"
 
         # En fonction de pos x et pos y, récupère le type de monstre
-        monstre = self.carte.carte[self.carte.posy][self.carte.posx]
+        monstre = self.carte.case
         # On récupère la vie du monstre
         self.vie_monstre = cs.COMBAT_START[monstre][0]
         # Et son nombre de dégâts
@@ -432,7 +422,7 @@ class Jeu (object):
             self.vie -= attaque
             if attaque > 0:
                 self.sons[cs.MARTEAUHIT].play()
-                time.sleep(.2)
+                time.sleep(.3)
                 self.sons[cs.JOUEURBLESSE].play()
 
             # Si on est mort, fin du jeu
@@ -442,7 +432,7 @@ class Jeu (object):
         # Si on a vaincu le monstre
         if self.vie_monstre <= 0:
             # et que c'était le boss final : fin du jeu
-            if self.carte.carte[self.carte.posy][self.carte.posx] == cs.BOSS_FINAL:
+            if self.carte.case == cs.BOSS_FINAL:
                 self.fin(cs.VICTOIRE)
             # Sinon : on continue la partie
             else:

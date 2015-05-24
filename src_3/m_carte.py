@@ -58,7 +58,7 @@ class Carte (object):
         elif new_posx >= self.nb_colonnes:
             new_posx -= self.nb_colonnes
         if new_posx >= 0 and new_posx < self.nb_colonnes:
-            if self.case not in cs.NOGO:
+            if self.carte[self.posy][new_posx] not in cs.NOGO:
                 self._posx = new_posx
 
     posx = property(_get_posx, _set_posx)
@@ -77,7 +77,7 @@ class Carte (object):
         elif new_posy >= self.nb_lignes:
             new_posy -= self.nb_lignes
         else:
-            if self.case not in cs.NOGO:
+            if self.carte[new_posy][self.posx] not in cs.NOGO:
                 self._posy = new_posy
 
     posy = property(_get_posy, _set_posy)
@@ -247,7 +247,6 @@ class Carte (object):
                 self.case = self.carte[y][x]
                 # On indique que l'on a redéfini la case :
                 redefinie = True
-            print(self.carte[y][x])
 
         # Si malgré tout, il n'y a pas de case adjacente adéquate, on utilise la plaine :
         if not redefinie:
