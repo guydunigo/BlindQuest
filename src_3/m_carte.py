@@ -76,9 +76,8 @@ class Carte (object):
             new_posy = self.nb_lignes + new_posy
         elif new_posy >= self.nb_lignes:
             new_posy -= self.nb_lignes
-        else:
-            if self.carte[new_posy][self.posx] not in cs.NOGO:
-                self._posy = new_posy
+        if self.carte[new_posy][self.posx] not in cs.NOGO:
+            self._posy = new_posy
 
     posy = property(_get_posy, _set_posy)
 

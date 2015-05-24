@@ -256,59 +256,59 @@ class Jeu (object):
     def move(self, direction=None):
         """Fonction qui déplace le joueur et gère ce qui peut y arriver (mort si environnement dangereux, combat...) et lance les sons d'environnement et de proximité.
       - direction : prend un chaîne de caractère parmi ("OUEST", "EST", "NORD", "SUD").
-          Si il n'est pas définit (ou à None), le joueur ne bouge pas."""
+          Si il n'est pas définit (ou à None), le joueur ne bouge pas mais on met tout de même le son à jour (utile après avoir utilisé la méthode empty par exemple)."""
 
         # On déplace le joueur su la carte et on récupère le code de la case d'arrivée :
         case = self.carte.move(direction)
-
-        if case is not None:
-            # On récupère les informations de proximité de la case (eau, pont...), qui sont écrites sous forme de mot binaire à partir des centaines :
-            infos_prox = int(case / 100)
-            case = case - infos_prox * 100
-
-            # Si le joueur arrive sur une case létale, on active à la fin.
-            if case in cs.DANGER:
-                self.fin(cs.DANGER[case])
-                # On renvoie None pour arrêter la fonction là :
-                return None
-            # Si on arrive sur une case bonus, le joueur reprend toute sa vie et on entend le jingle associé :
-            elif case == cs.BONUS:
-                # On joue le jingle :
-                self.sons[cs.CONV[cs.BONUS]].play()
-                # On remet la vie du joueur au maximum :
-                self.vie = cs.VIE
-                # On vide la case et on récupère le nouveau type d'environnement :
-                case = self.carte.empty()
-                # On met à jour les valeurs de case et de proximité :
+        if direction is None or case is not None :
+            if case is not None:
+                # On récupère les informations de proximité de la case (eau, pont...), qui sont écrites sous forme de mot binaire à partir des centaines :
                 infos_prox = int(case / 100)
                 case = case - infos_prox * 100
-            # Si on arrive sur une case combat, on passe en mode combat, ... :
-            elif case in cs.COMBAT_START:
-                self.combat_init()
-        # Sinon on récupère les informations de la case actuelle :
-        else:
-            case = self.carte.case
-            infos_prox = self.carte.detect_prox()
 
-        print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
-
-        # Restitution de l'environnement actuel :
-        # Si la source est déjà active, on la remet au début :
-        if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
-            self.lecteurs["env"].seek(0)
-        elif case in cs.COMBAT_START:
-            self.lecteurs["env"].queue(self.sons[cs.COMBAT])
-            self.lecteurs["env"].next_source()
-        else:
-            self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
-            self.lecteurs["env"].next_source()
-
-        # Détection des proximités et restitution du son associé :
-        for prox in cs.PROX:
-            if infos_prox & cs.PROX[prox] == cs.PROX[prox]:
-                self.lecteurs[prox].play()
+                # Si le joueur arrive sur une case létale, on active à la fin.
+                if case in cs.DANGER:
+                    self.fin(cs.DANGER[case])
+                    # On renvoie None pour arrêter la fonction là :
+                    return None
+                # Si on arrive sur une case bonus, le joueur reprend toute sa vie et on entend le jingle associé :
+                elif case == cs.BONUS:
+                    # On joue le jingle :
+                    self.sons[cs.CONV[cs.BONUS]].play()
+                    # On remet la vie du joueur au maximum :
+                    self.vie = cs.VIE
+                    # On vide la case et on récupère le nouveau type d'environnement :
+                    case = self.carte.empty()
+                    # On met à jour les valeurs de case et de proximité :
+                    infos_prox = int(case / 100)
+                    case = case - infos_prox * 100
+                # Si on arrive sur une case combat, on passe en mode combat, ... :
+                elif case in cs.COMBAT_START:
+                    self.combat_init()
+            # Sinon on récupère les informations de la case actuelle :
             else:
-                self.lecteurs[prox].pause()
+                case = self.carte.case
+                infos_prox = self.carte.detect_prox()
+
+            print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
+
+            # Restitution de l'environnement actuel :
+            # Si la source est déjà active, on la remet au début :
+            if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
+                self.lecteurs["env"].seek(0)
+            elif case in cs.COMBAT_START:
+                self.lecteurs["env"].queue(self.sons[cs.COMBAT])
+                self.lecteurs["env"].next_source()
+            else:
+                self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
+                self.lecteurs["env"].next_source()
+
+            # Détection des proximités et restitution du son associé :
+            for prox in cs.PROX:
+                if infos_prox & cs.PROX[prox] == cs.PROX[prox]:
+                    self.lecteurs[prox].play()
+                else:
+                    self.lecteurs[prox].pause()
 
     def afficher_aide(self):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
@@ -360,12 +360,15 @@ class Jeu (object):
         """Charge une partie en utilisant l'attribut num_sauv, si c'est une chaîne vide, on utilise la dernière sauvegarde."""
         # Si la chaîne est vide :
         liste_saves = [i.replace(".txt", "") for i in os.listdir("saves") if i[-4:] == ".txt"]
-        if int(self.num_sauv) < len(liste_saves):
-            sauv = 21
+        if self.num_sauv != '' and int(self.num_sauv) < len(liste_saves):
+            sauv = liste_saves[int(self.num_sauv)].split('_')
+            self.carte = mc.Carte(sauv[0], sauv[1])
+            self.vie = self.carte.player_info[0]
+            self.state = "debut"
+            self.move()
         else:
-            print("Il n'existe pas de fichier à ce numéro.")
             pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [0, 0, self.window.width, 0, self.window.width, 47, 0, 47]), ('c4B', (0, 0, 0, 255) * 4))
-            pyglet.text.Label("Il n'existe pas de sauvegarde à ce numéro.", x=20, y=20, color=(255, 0, 0, 255))
+            pyglet.text.Label("Il n'existe pas de sauvegarde à ce numéro.", x=20, y=20, color=(255, 255, 255, 255)).draw()
         self.state = self.state.replace('C', '')
 
     def afficher_load(self):
