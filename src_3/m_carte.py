@@ -20,6 +20,7 @@ class Carte (object):
 
     def __init__(self, type_carte="defaut", num_sauv=None):
         """Constructeur : Charge la carte dans une liste de listes (attribut carte) et définit la position par défaut du joueur (attributs posx et posy), et stocke le nom de la carte (attribut type_carte).
+        Il existe un attribut 'case' qui donne le type de case sur laquelle le joueur se trouve, cet attribut permet aussi de modifier cette case.
         - Arguments :
       carte_type : Nom de la carte utilisée
       num_sauv : Si définit, il charge une sauvegarde, cet argument indique le numéro de la sauvegarde à charger.
@@ -28,8 +29,6 @@ class Carte (object):
         # Initialisation de la position du joueur :
         self._posx = 0
         self._posy = 0
-        # Initialisation du type de case et des informations de proximité de la case du joueur :
-        self.case = cs.DEPART
         # On sauvegarde le nom de la carte :
         self.type_carte = type_carte
 
@@ -62,9 +61,6 @@ class Carte (object):
             if self.case not in cs.NOGO:
                 self._posx = new_posx
 
-        # On met à jour les informations de case du joueur :
-        self.case = self.carte[self.posy][self.posx]
-
     posx = property(_get_posx, _set_posx)
 
     # Encapsulation pour l'ordonnée du joueur (posy) :
@@ -84,11 +80,20 @@ class Carte (object):
             if self.case not in cs.NOGO:
                 self._posy = new_posy
 
-        # On met à jour les informations de case du joueur :
-        self.case = self.carte[self.posy][self.posx]
-
     posy = property(_get_posy, _set_posy)
 
+    # Encapsulation pour la case du joueur :
+    def _get_case(self):
+        """Accesseur de l'attribut case"""
+        return self.carte[self.posy][self.posx]
+
+    def _set_case(self, new_case):
+        """Mutateur de l'attribut case.
+        Permet de modifier la case du joueur si le type existe."""
+        if new_case in cs.CONV:
+            self.carte[self.posy][self.posx] = new_case
+
+    case = property(_get_case, _set_case)
 
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
@@ -239,17 +244,17 @@ class Carte (object):
             # Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
             if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.carte[y][x] not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.carte[y][x] not in cs.COMBAT_START:
                 # On affecte la nouvelle valeur :
-                self.carte[self.posy][self.posx] = self.carte[y][x]
+                self.case = self.carte[y][x]
                 # On indique que l'on a redéfini la case :
                 redefinie = True
             print(self.carte[y][x])
 
         # Si malgré tout, il n'y a pas de case adjacente adéquate, on utilise la plaine :
         if not redefinie:
-            self.carte[self.posy][self.posx] = cs.PLAINE
+            self.case = cs.PLAINE
 
         # On retourne la nouvelle valeur de la case :
-        return self.carte[self.posy][self.posx] + self.detect_prox() * 100
+        return self.case + self.detect_prox() * 100
 
     def save(self, player_info):
         """Sauvegarde dans un fichier la carte et les informations du joueur (position, vie, ...)
