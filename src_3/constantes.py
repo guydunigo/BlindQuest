@@ -11,7 +11,7 @@
 # Définition des constantes
 
 # Carte utilisée :
-CARTE = "test"
+CARTE = "defaut"
 
 # Quantité de vie du personnage :
 VIE = 10
@@ -109,7 +109,7 @@ DANGER = {
 ##############################################################
 
 # Constantes de l'éditeur (couleurs, ...) :
-TAILLE_CASE = 20
+TAILLE_CASE = 15
 
 # Couleurs :
 COULEUR_PLAINE = ('c4B', (150,175,10,0)*4)                              # VERT CLAIR
