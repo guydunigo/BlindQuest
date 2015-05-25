@@ -15,7 +15,7 @@ import random
 
 # Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 import pyglet
-print("Utilisation de la version de pyglet du dossier src/ (", pyglet.version, ").\n")
+print("Utilisation de la version de pyglet du dossier source (", pyglet.version, ").\n")
 
 # Importation des constantes :
 import constantes as cs
@@ -32,7 +32,7 @@ class Jeu (object):
 
         # Si le dossier de travail de python (le dossier depuis lequel python a été lancé) est le dossier du code source ('src_3'), on va dans le dossier principal.
         if "/src_3" in os.getcwd()[-6:]:
-            print("Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).\n")
+            print(u"Le programme a été lancé depuis le dossier src_3, changement du dossier vers le dossier parent (dossier principal du projet).\n")
             os.chdir("../")
         # Réglage du dossier de travail de pyglet pour le dossier racine du projet, sinon il ne trouve pas les différents composants :
         working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -90,7 +90,7 @@ class Jeu (object):
     On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de 'source already queued'."""
 
         # On prévient que le temps de chargement est normal :
-        print("Chargement des sons en mémoire...")
+        print(u"Chargement des sons en mémoire...")
 
         # On crée le dictionnaire de sons :
         self.sons = {}
@@ -107,7 +107,7 @@ class Jeu (object):
                 self.sons[son.replace(".wav", '')] = pyglet.media.load(os.path.join("sons", son), streaming=False)
         else:
             # On lève une erreur si le dossier 'sons' n'a pas été trouvé.
-            raise FileNotFoundError("Le dossier 'sons' n'a pas été trouvé.")
+            raise FileNotFoundError(u"Le dossier 'sons' n'a pas été trouvé.")
 
     def creer_lecteurs(self):
         """Crée les lecteurs pyglet, les lecteurs env, heartbeat, et les lecteurs de proximités (définis dans le fichier constantes) sont réglés pour tourner en boucle sur la musique en cours :
