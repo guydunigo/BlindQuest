@@ -4,7 +4,7 @@
 #                               #
 #         Projet de MDD         #
 #                               #
-#       fichier : m_jeu.py      #
+#  fichier : editeur_cartes.py  #
 #                               #
 # # # # # # # # # # # # # # # # #
 
@@ -22,9 +22,7 @@ import constantes as cs
 # Importation de notre module qui gère la carte et la position du joueur :
 import m_carte as mc
 
-
-# Début de la classe carte
-class Editeur(mc.Carte):
+class Editeur(object):
     """Classe qui gère l'éditeur de carte."""
 
     def __init__(self, carte=None):

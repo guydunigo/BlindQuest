@@ -48,7 +48,7 @@ Type=Application" > blindquest.desktop
 
   ;;
   --map-editor|-m)
-    python3 ./scripts/editeur_cartes.py
+    python3 ./src_3/editeur_cartes.py
   ;;
   *)
     echo "Jeu BlindQuest,
