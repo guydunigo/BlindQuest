@@ -11,7 +11,7 @@
 # Définition des constantes
 
 # Carte utilisée :
-CARTE = "defaut"
+CARTE = "petite"
 
 # Quantité de vie du personnage :
 VIE = 10
