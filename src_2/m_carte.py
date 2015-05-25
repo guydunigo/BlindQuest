@@ -165,7 +165,7 @@ class Carte (object):
             # Boucle des abscisses :
             while not found and i < len(self.carte):
                 if self.carte[j][i] == cs.DEPART:
-                    self.posx, self.posy = i, j
+                    self._posx, self._posy = i, j
                     found = True
                 i += 1
             j += 1
