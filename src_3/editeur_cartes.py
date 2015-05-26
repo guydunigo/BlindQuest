@@ -22,51 +22,66 @@ import constantes as cs
 # Importation de notre module qui gère la carte et la position du joueur :
 import m_carte as mc
 
+class Map(mc.Carte):
+    """Classe qui hérite de la classe map"""
+    
+    def __init__(self,carte=None):
+        mc.Carte.__init__(self,carte)
+        self._nb_colonnes, self._nb_lignes = self.nb_colonnes, self.nb_lignes
+        print(self._nb_colonnes,self._nb_lignes,self.nb_colonnes,nb_lignes)
+
+    def _get_nb_colonnes(self):
+        return self._nb_colonnes
+    def _set_nb_colonnes(self, new_nb):
+        if new_nb > self.nb_colonnes:
+            for j in range(new_nb):
+                for i in self.carte:
+                    i.append(cs.NOGO)
+        elif new_nb < self.nb_colonnes:
+            for j in range(new_nb):
+                for i in self.carte.carte:
+                    del i[-1]
+
+    nb_colonnes = property(_get_nb_colonnes, _set_nb_colonnes)
+
+    def _get_nb_lignes(self):
+        return self._nb_lignes
+    def _set_nb_lignes(self, new_nb):
+        if new_nb > self.nb_lignes:
+                self.carte.append([cs.NOGO for i in range(self.carte[i])])
+        elif new_nb < self.nb_lignes:
+            del self.carte[-1]
+
+    nb_lignes = property(_get_nb_lignes, _set_nb_lignes)
+
 class Editeur(object):
     """Classe qui gère l'éditeur de carte."""
 
     def __init__(self, carte=None):
 
-        self.ouvrir_carte(carte)
-        self.window = pyglet.window.Window(width=self.nb_colonnes * cs.TAILLE_CASE, height=self.nb_lignes * cs.TAILLE_CASE)
+        # Si un nom de carte est donné, on essaie de la charger
+        # Si ladite carte n'existe pas, on en crée une :
+        if carte is not None:
+            try:
+                carte = Map(carte)
+            except FileNotFoundError:
+                print(u" Fichier carte introuvable !!!")
+                self.creer()
+        # Sinon, on en crée une :
+        else:
+            self.creer()
+
+        # On crée la fenêtre pyglet de la taille de la carte à charger, plus une ligne pour les informations :
+        self.window = pyglet.window.Window(width=self.nb_colonnes * cs.TAILLE_CASE, height=(self.nb_lignes + 1) * cs.TAILLE_CASE)
+
+        # On initialise les événements :
         self.event_init()
 
-        # Coordonnées du curseur :
-        self._cx = 0
-        self._cy = 0
-
-        self._type_actif = 0
+        # On initialise le type actif à la plaine :
+        self._type_actif = cs.PLAINE
 
         # On affiche la carte de base.
-        self.afficher
-
-    def _get_cx(self):
-        """Accesseur de l'absisse du curseur"""
-        return self._cx
-
-    def _set_cx(self, new_cx):
-        """Mutateur de l'absisse du curseur"""
-        if new_cx >= self.nb_colonnes:
-            self._cx = 0
-        elif new_cx < 0:
-            self._cx = self.nb_colonnes - 1
-        else:
-            self._cx = new_cx
-    cx = property(_get_cx, _set_cx)
-
-    def _get_cy(self):
-        """Accesseur de l'ordonné du curseur"""
-        return self._cy
-
-    def _set_cy(self, new_cy):
-        """Mutateur de l'ordonné du curseur"""
-        if new_cy >= self.nb_lignes:
-            self._cy = 0
-        elif new_cy < 0:
-            self._cy = self.nb_lignes - 1
-        else:
-            self._cy = new_cy
-    cy = property(_get_cy, _set_cy)
+        self.afficher()
 
     def _get_type_actif(self):
         """Accesseur du type d'environnement actif."""
@@ -88,38 +103,15 @@ Si la valeur proposée correspond à un type existant sinon si la valeur propos�
                 new_type += 1
 
         self._type_actif = new_type
+
     type_actif = property(_get_type_actif, _set_type_actif)
-
-    def ouvrir_carte(self, carte):
-        """Essaye d'ouvrir la carte carte_nom.txt (où nom est une chaîne de caractères contenue dans l'argument carte) dans le dossier cartes. Si un mauvais nom est donné ou que la carte n'éxiste pas, on crée une nouvelle carte."""
-
-        try:
-            with open("./cartes/carte_" + carte + ".txt", "r") as fichier_carte:
-                self.charger_carte(fichier_carte)
-                self.nom = carte
-
-        except TypeError:
-            if carte is not None:
-                print("Mauvais type de nom de carte")
-            self.creer()
-
-        except FileNotFoundError:
-            print("Carte 'carte_" + carte + ".txt' non trouvée dans le dossier cartes")
-            self.creer()
 
     def creer(self):
         """Demande le nom, le nombre de colonnes et de lignes et crée une carte remplie de plaines"""
 
-        self.nom = input("Entrez le nom de la nouvelle carte :")
-        self.nb_lignes = int(input("Entrez le nombre de lignes de la carte : "))
-        self.nb_colonnes = int(input("Entrez le nombre de colonnes de la carte : "))
-
-        self.carte = []
-
-        for i in range(self.nb_lignes):
-            self.carte.append([])
-            for j in range(self.nb_colonnes):
-                self.carte[i].append(00)
+        self.nom = input(u"Entrez le nom de la nouvelle carte : ")
+        self.carte.nb_lignes = int(input(u"Entrez le nombre de lignes de la carte : "))
+        self.carte.nb_colonnes = int(input(u"Entrez le nombre de colonnes de la carte : "))
 
     def charger_carte(self, fichier_carte):
         """Charge le contenu d'un fichier carte dans une liste et met à jour en conséquence le nombre de colonnes et de lignes."""
@@ -176,7 +168,5 @@ Si la valeur proposée correspond à un type existant sinon si la valeur propos�
 
 # Exécution du programme
 if __name__ == "__main__":
-
-    carte = Editeur(cs.CARTE)
-
+    edit = Editeur(cs.CARTE)
     pyglet.app.run()

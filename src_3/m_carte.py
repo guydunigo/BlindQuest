@@ -44,6 +44,19 @@ class Carte (object):
             self.ouvrir_fichier_carte("saves", type_carte + "_" + num_sauv)
             self.get_player_info()
 
+    def __repr__(self):
+        """Méthode spéciale appelée lors d'un print de l'objet.
+        En clair : print(carte) donne un tableau de valeurs de la carte comme représenté dans le fichier carte."""
+        string = ""
+        for i in self.carte:
+            for j in i:
+                if len(str(j)) == 1:
+                    string += '0' + str(j) + ' '
+                else:
+                    string += str(j) + ' '
+            string += '\n'
+        return string
+
     # Encapsulation pour l’abscisse du joueur (posx) :
     def _get_posx(self):
         """Accesseur de l'attribut posx"""
