@@ -40,7 +40,7 @@ class Jeu (object):
         pyglet.resource.reindex()
 
         # On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas (segfaults))
-        pyglet.options['audio'] = ('openal', )
+        # pyglet.options['audio'] = ('openal', )
 
         # Chargement de la carte :
         self.carte = mc.Carte(type_carte)

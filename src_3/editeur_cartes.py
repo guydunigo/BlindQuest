@@ -22,16 +22,24 @@ import constantes as cs
 # Importation de notre module qui gère la carte et la position du joueur :
 import m_carte as mc
 
-class Map(mc.Carte):
-    """Classe qui hérite de la classe map"""
-    
-    def __init__(self,carte=None):
-        mc.Carte.__init__(self,carte)
-        self._nb_colonnes, self._nb_lignes = self.nb_colonnes, self.nb_lignes
-        print(self._nb_colonnes,self._nb_lignes,self.nb_colonnes,nb_lignes)
 
-    def _get_nb_colonnes(self):
-        return self._nb_colonnes
+class Map(mc.Carte):
+    """Classe qui hérite de la classe Carte du module m_carte et qui permet de gérer la carte dans l'éditeur."""
+
+    def __init__(self, carte=None, width=5, height=5):
+
+        try:
+            mc.Carte.__init__(self, carte)
+        except FileNotFoundError:
+            pass
+
+        # Si carte est à None, une nouvelle carte est créée :
+        if carte is None:
+            for i in range(self.nb_lignes):
+                for j in range(self.nb_colonnes):
+                    self.carte[i][j] = cs.PLAINE
+            self.nb_colonnes, self.nb_lignes = width, height
+
     def _set_nb_colonnes(self, new_nb):
         if new_nb > self.nb_colonnes:
             for j in range(new_nb):
@@ -42,17 +50,16 @@ class Map(mc.Carte):
                 for i in self.carte.carte:
                     del i[-1]
 
-    nb_colonnes = property(_get_nb_colonnes, _set_nb_colonnes)
+    nb_colonnes = property(mc.Carte._get_nb_colonnes, _set_nb_colonnes)
 
-    def _get_nb_lignes(self):
-        return self._nb_lignes
     def _set_nb_lignes(self, new_nb):
         if new_nb > self.nb_lignes:
                 self.carte.append([cs.NOGO for i in range(self.carte[i])])
         elif new_nb < self.nb_lignes:
             del self.carte[-1]
 
-    nb_lignes = property(_get_nb_lignes, _set_nb_lignes)
+    nb_lignes = property(mc.Carte._get_nb_lignes, _set_nb_lignes)
+
 
 class Editeur(object):
     """Classe qui gère l'éditeur de carte."""
@@ -72,7 +79,7 @@ class Editeur(object):
             self.creer()
 
         # On crée la fenêtre pyglet de la taille de la carte à charger, plus une ligne pour les informations :
-        self.window = pyglet.window.Window(width=self.nb_colonnes * cs.TAILLE_CASE, height=(self.nb_lignes + 1) * cs.TAILLE_CASE)
+        self.window = pyglet.window.Window(width=self.carte.nb_colonnes * cs.TAILLE_CASE, height=(self.carte.nb_lignes + 1) * cs.TAILLE_CASE)
 
         # On initialise les événements :
         self.event_init()

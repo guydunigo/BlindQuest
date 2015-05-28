@@ -107,6 +107,16 @@ class Carte (object):
 
     case = property(_get_case, _set_case)
 
+    def _get_nb_colonnes(self):
+        return self._nb_colonnes
+
+    nb_colonnes = property(_get_nb_colonnes)
+
+    def _get_nb_lignes(self):
+        return self._nb_lignes
+
+    nb_lignes = property(_get_nb_lignes)
+
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
         Une erreur est levée si le dossier ou le fichier n'existe pas.
@@ -138,17 +148,17 @@ class Carte (object):
             del(self.carte[-1])
 
         # On compte le nombre de lignes :
-        self.nb_lignes = len(self.carte)
+        self._nb_lignes = len(self.carte)
         # On compte le nombre de colonnes et on complète les lignes de taille différente par de l'eau
         # Init la variable :
-        self.nb_colonnes = 0
+        self._nb_colonnes = 0
         # On recherche la ligne la plus grande :
         for liste in self.carte:
-            if self.nb_colonnes < len(liste):
-                self.nb_colonnes = len(liste)
+            if self._nb_colonnes < len(liste):
+                self._nb_colonnes = len(liste)
         # On complète par de l'eau:
         for liste in self.carte:
-            while len(liste) < self.nb_colonnes:
+            while len(liste) < self._nb_colonnes:
                 liste.append(cs.EAU)
 
     def get_player_info(self):
