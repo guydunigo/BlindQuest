@@ -175,7 +175,7 @@ class Jeu (object):
                 self.num_sauv = ''
 
             # En cas de chargement :
-            if "C" in self.state:
+            elif "C" in self.state:
                 if symbol == pyglet.window.key.ENTER:
                     self.load()
                 elif symbol == pyglet.window.key.NUM_0 or symbol == pyglet.window.key._0:
@@ -383,9 +383,6 @@ Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la
                 message = u"Choisissez une sauvegarde à charger :\n"
                 for i, j in enumerate(liste_sauv):
                     message += u"{} : {}\n".format(i, j)
-                carte = "basic"
-                num = "0"
-                self.carte = mc.Carte(carte, num)
         else:
             message = u"Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
 
