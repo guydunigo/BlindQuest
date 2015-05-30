@@ -18,7 +18,7 @@ import constantes as cs
 class Carte (object):
     """Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
-    def __init__(self, type_carte="defaut", num_sauv=None):
+    def __init__(self, type_carte="basic", num_sauv=None):
         """Constructeur : Charge la carte dans une liste de listes (attribut carte) et définit la position par défaut du joueur (attributs posx et posy), et stocke le nom de la carte (attribut type_carte).
         Il existe un attribut 'case' qui donne le type de case sur laquelle le joueur se trouve, cet attribut permet aussi de modifier cette case.
         - Arguments :
@@ -66,13 +66,13 @@ class Carte (object):
         """Mutateur de l'attribut posx.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
-        if new_posx < 0:
-            new_posx = self.nb_colonnes + new_posx
-        elif new_posx >= self.nb_colonnes:
-            new_posx -= self.nb_colonnes
-        if new_posx >= 0 and new_posx < self.nb_colonnes:
-            if self.carte[self.posy][new_posx] not in cs.NOGO:
-                self._posx = new_posx
+        while new_posx > 0 and new_posx >= self.nb_colonnes:
+            if new_posx < 0:
+                new_posx = self.nb_colonnes + new_posx
+            elif new_posx >= self.nb_colonnes:
+                new_posx -= self.nb_colonnes
+        if self.carte[self.posy][new_posx] not in cs.NOGO:
+            self._posx = new_posx
 
     posx = property(_get_posx, _set_posx)
 
@@ -85,10 +85,11 @@ class Carte (object):
         """Mutateur de l'attribut posy.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
-        if new_posy < 0:
-            new_posy = self.nb_lignes + new_posy
-        elif new_posy >= self.nb_lignes:
-            new_posy -= self.nb_lignes
+        while new_posy < 0 and new_posy >= self.nb_lignes:
+            if new_posy < 0:
+                new_posy = self.nb_lignes + new_posy
+            elif new_posy >= self.nb_lignes:
+                new_posy -= self.nb_lignes
         if self.carte[new_posy][self.posx] not in cs.NOGO:
             self._posy = new_posy
 
@@ -108,14 +109,24 @@ class Carte (object):
     case = property(_get_case, _set_case)
 
     def _get_nb_colonnes(self):
-        return self._nb_colonnes
+        """Renvoie le nombre de colonnes de la carte, toutes les lignes ont le même nombre de colonnes)."""
+        return len(self.carte[0])
 
-    nb_colonnes = property(_get_nb_colonnes)
+    def _set_nb_colonnes(self, new):
+        """On ne peut modifier le nombre de colonnes."""
+        pass
+
+    nb_colonnes = property(_get_nb_colonnes, _set_nb_colonnes)
 
     def _get_nb_lignes(self):
-        return self._nb_lignes
+        """Renvoie le nombre de lignes"""
+        return len(self.carte)
 
-    nb_lignes = property(_get_nb_lignes)
+    def _set_nb_lignes(self, new):
+        """On ne peut modifier le nombre de lignes."""
+        pass
+
+    nb_lignes = property(_get_nb_lignes, _set_nb_lignes)
 
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
@@ -147,18 +158,16 @@ class Carte (object):
         if self.carte[-1] == []:
             del(self.carte[-1])
 
-        # On compte le nombre de lignes :
-        self._nb_lignes = len(self.carte)
         # On compte le nombre de colonnes et on complète les lignes de taille différente par de l'eau
         # Init la variable :
-        self._nb_colonnes = 0
+        nb_colonnes = 0
         # On recherche la ligne la plus grande :
         for liste in self.carte:
-            if self._nb_colonnes < len(liste):
-                self._nb_colonnes = len(liste)
+            if nb_colonnes < len(liste):
+                nb_colonnes = len(liste)
         # On complète par de l'eau:
         for liste in self.carte:
-            while len(liste) < self._nb_colonnes:
+            while len(liste) < nb_colonnes:
                 liste.append(cs.EAU)
 
     def get_player_info(self):
