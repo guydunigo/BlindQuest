@@ -66,7 +66,7 @@ class Carte (object):
         """Mutateur de l'attribut posx.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
-        while new_posx > 0 and new_posx >= self.nb_colonnes:
+        while new_posx > 0 or new_posx >= self.nb_colonnes:
             if new_posx < 0:
                 new_posx = self.nb_colonnes + new_posx
             elif new_posx >= self.nb_colonnes:
@@ -85,7 +85,7 @@ class Carte (object):
         """Mutateur de l'attribut posy.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
-        while new_posy < 0 and new_posy >= self.nb_lignes:
+        while new_posy < 0 or new_posy >= self.nb_lignes:
             if new_posy < 0:
                 new_posy = self.nb_lignes + new_posy
             elif new_posy >= self.nb_lignes:
