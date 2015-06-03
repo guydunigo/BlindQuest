@@ -66,7 +66,7 @@ class Carte (object):
         """Mutateur de l'attribut posx.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
-        while new_posx > 0 or new_posx >= self.nb_colonnes:
+        while new_posx < 0 or new_posx >= self.nb_colonnes:
             if new_posx < 0:
                 new_posx = self.nb_colonnes + new_posx
             elif new_posx >= self.nb_colonnes:
@@ -108,6 +108,7 @@ class Carte (object):
 
     case = property(_get_case, _set_case)
 
+    # Encapsulation pour le nombre de colonnes :
     def _get_nb_colonnes(self):
         """Renvoie le nombre de colonnes de la carte, toutes les lignes ont le même nombre de colonnes)."""
         return len(self.carte[0])
@@ -118,6 +119,7 @@ class Carte (object):
 
     nb_colonnes = property(_get_nb_colonnes, _set_nb_colonnes)
 
+    # Encapsulation pour le nombre de lignes :
     def _get_nb_lignes(self):
         """Renvoie le nombre de lignes"""
         return len(self.carte)
