@@ -44,23 +44,23 @@ FIN             = 99
 # Dictionnaire de conversion code de case -> nom du fichier son au format wav :
 
 CONV = {
-  PLAINE        : "BlindQuest-Plaine",
-  FORET         : "BlindQuest-Foret",
-  CAVERNE       : "BlindQuest-Caverne",
+  PLAINE        : "plaine",
+  FORET         : "foret",
+  CAVERNE       : "caverne",
   EAU           : "eau",
-  CHATEAU       : "BlindQuest-Chateau",
+  CHATEAU       : "chateau",
   SENTIER       : "BlindQuest-Sentier",
   PONT          : "pont",
   SABLE         : "sable",
   MONSTRE       : "monstre",
   BOSS          : "boss",
   BOSS_FINAL    : "boss_final",
-  BONUS         : "BlindQuest-Bonus",
+  BONUS         : "bonus",
   MER           : "mer",
   ENTREECHATEAU : "entreechateau",
   MAGIE         : "BlindQuest-Magie",
   FUNNY         : "NyanCatoriginal",
-  DEPART        : "BlindQuest-Theme",
+  DEPART        : "depart",
   FIN           : "fin"
 }
 

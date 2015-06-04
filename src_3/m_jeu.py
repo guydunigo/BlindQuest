@@ -244,7 +244,8 @@ class Jeu (object):
             elif self.paused != []:
                 pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x=20, y=20).draw()
             # Si le jeu est finit : on propose de redémarrer une partie :
-            elif self.state
+            elif self.state == "":
+                pass
             # Affichage de l'aide :
             if 'H' in self.state:
                 self.afficher_aide()
