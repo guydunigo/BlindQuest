@@ -53,14 +53,21 @@ S pour sauvegarder une partie
 C pour charger une partie
 
 La bibliothèque Openal est nécessaire au bon fonctionnement du jeu :
+
 ArchLinux : sudo pacman -S openal
+
 Ubuntu/Debian : sudo apt-get install libopenal1
+
 Fedora : sudo yum install openal
+
 Mac : installé par défaut
+
 Windows : un fichier d'installation est disponible dans le dossier "divers"
 
-Pour lancer le jeu : 
+Pour lancer le jeu :
+
 Sous GNU/Linux & Mac : Depuis le dossier du jeu dans un terminal : sh ./blindquest.sh
+
 Sous windows : Lancer le fichier blindquest_win_py2.bat ou blindquest_win_py3.bat selon la version de python installée. 
 
 
