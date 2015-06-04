@@ -71,7 +71,7 @@ class Carte (object):
                 new_posx = self.nb_colonnes + new_posx
             elif new_posx >= self.nb_colonnes:
                 new_posx -= self.nb_colonnes
-        if self.carte[self.posy][new_posx] not in cs.NOGO:
+        if self.get_case_type(new_posx, self.posy) not in cs.NOGO:
             self._posx = new_posx
 
     posx = property(_get_posx, _set_posx)
@@ -90,7 +90,7 @@ class Carte (object):
                 new_posy = self.nb_lignes + new_posy
             elif new_posy >= self.nb_lignes:
                 new_posy -= self.nb_lignes
-        if self.carte[new_posy][self.posx] not in cs.NOGO:
+        if self.get_case_type(self.posx, new_posy) not in cs.NOGO:
             self._posy = new_posy
 
     posy = property(_get_posy, _set_posy)
@@ -98,12 +98,12 @@ class Carte (object):
     # Encapsulation pour la case du joueur :
     def _get_case(self):
         """Accesseur de l'attribut case_joueur"""
-        return self.carte[self.posy][self.posx]
+        return self.get_case_type(self.posx, self.posy)
 
     def _set_case(self, new_case):
         """Mutateur de l'attribut case_joueur.
         Permet de modifier la case du joueur si le type existe."""
-        self.set_case_type(new_case, self.posx, self.posy)
+        self.set_case_type(self.posx, self.posy, new_case)
 
     case = property(_get_case, _set_case)
 
@@ -206,7 +206,7 @@ class Carte (object):
             i = 0
             # Boucle des abscisses :
             while not found and i < len(self.carte):
-                if self.carte[j][i] == cs.DEPART:
+                if self.get_case_type(i, j) == cs.DEPART:
                     self._posx, self._posy = i, j
                     found = True
                 i += 1
@@ -250,24 +250,24 @@ class Carte (object):
         # On regarde si les différents types qui doivent être détectés sont à proximité :
         for prox in cs.PROX:
             # NORD :
-            if self.carte[self.posy - 1][self.posx] == prox:
+            if self.get_case_type(self.posx, self.posy - 1) == prox:
                 detect |= cs.PROX[prox]
             # SUD :
             if self.posy < self.nb_lignes - 1:
-                if self.carte[self.posy + 1][self.posx] == prox:
+                if self.get_case_type(self.posx, self.posy + 1) == prox:
                     detect |= cs.PROX[prox]
             else:
-                if self.carte[0][self.posx] == prox:
+                if self.get_case_type(self.posx, 0) == prox:
                     detect |= cs.PROX[prox]
             # OUEST :
-            if self.carte[self.posy][self.posx - 1] == prox:
+            if self.get_case_type(self.posx - 1, self.posy) == prox:
                 detect |= cs.PROX[prox]
             # EST :
             if self.posx < self.nb_colonnes - 1:
-                if self.carte[self.posy][self.posx + 1] == prox:
+                if self.get_case_type(self.posx + 1, self.posy) == prox:
                     detect |= cs.PROX[prox]
             else:
-                if self.carte[self.posy][0] == prox:
+                if self.get_case_type(0, self.posy) == prox:
                     detect |= cs.PROX[prox]
 
         return detect
@@ -283,9 +283,9 @@ class Carte (object):
         # On parcoure les cases aux points cardinaux :
         for x, y in [(self.posx - 1, self.posy), (self.posx + 1, self.posy), (self.posx, self.posy - 1), (self.posx, self.posy + 1)]:
             # Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
-            if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.carte[y][x] not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.carte[y][x] not in cs.COMBAT_START:
+            if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.get_case_type(x, y) not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.get_case_type(x, y) not in cs.COMBAT_START:
                 # On affecte la nouvelle valeur :
-                self.case = self.carte[y][x]
+                self.case = self.get_case_type(x, y)
                 # On indique que l'on a redéfini la case :
                 redefinie = True
 

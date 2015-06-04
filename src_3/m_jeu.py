@@ -40,7 +40,7 @@ class Jeu (object):
         pyglet.resource.reindex()
 
         # On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas (segfaults))
-        pyglet.options['audio'] = ('openal',)
+        pyglet.options['audio'] = ('openal', )
 
         # Chargement de la carte :
         self.carte = mc.Carte(type_carte)
@@ -116,7 +116,7 @@ class Jeu (object):
       - Les différents sons de proximité ont leur propre lecteur, en boucle.
     """
 
-        try :
+        try:
             self.lecteurs = {}
             for lecteur in ("env", "heartbeat"):
                 self.lecteurs[lecteur] = pyglet.media.Player()
@@ -224,6 +224,8 @@ class Jeu (object):
             # Au début :
             elif self.state == "debut" and symbol == pyglet.window.key.SPACE:
                 self.state = "normal"
+            elif self.state == "fin" and symbol == pyglet.window.key.SPACE:
+                self.__init__(self.carte.type_carte)
 
         @self.window.event
         def on_key_release(symbol, modifiers):
@@ -249,8 +251,8 @@ class Jeu (object):
             elif self.paused != []:
                 pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x=20, y=20).draw()
             # Si le jeu est finit : on propose de redémarrer une partie :
-            elif self.state == "":
-                pass
+            elif self.state == "fin":
+                pyglet.text.Label("Fin du jeu, appuyez sur la touche ESPACE pour recommencer une partie.").draw()
             # Affichage de l'aide :
             if 'H' in self.state:
                 self.afficher_aide()
