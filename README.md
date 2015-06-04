@@ -52,13 +52,13 @@ S pour sauvegarder une partie
 
 C pour charger une partie
 
-La bibliothèque Openal est nécessaire au bon fonctionnement du jeu
+La bibliothèque Openal est nécessaire au bon fonctionnement du jeu :
 ArchLinux : 
- # pacman -S openal
+# pacman -S openal
 Ubuntu/Debian :
- # apt-get install libopenal1
+# apt-get install libopenal1
 Fedora :
- # yum install openal
+# yum install openal
 Mac : installé par défaut
 Windows : un fichier d'installation est disponible dans le dossier "divers"
 
