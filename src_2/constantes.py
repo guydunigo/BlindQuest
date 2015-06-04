@@ -58,8 +58,8 @@ CONV = {
   BONUS         : "BlindQuest-Bonus",
   MER           : "mer",
   ENTREECHATEAU : "entreechateau",
-  MAGIE         : "BlindQuest-Magie"
-  FUNNY         : "NyanCatoriginal"
+  MAGIE         : "BlindQuest-Magie",
+  FUNNY         : "NyanCatoriginal",
   DEPART        : "BlindQuest-Theme",
   FIN           : "fin"
 }
