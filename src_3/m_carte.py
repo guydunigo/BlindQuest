@@ -97,14 +97,13 @@ class Carte (object):
 
     # Encapsulation pour la case du joueur :
     def _get_case(self):
-        """Accesseur de l'attribut case"""
+        """Accesseur de l'attribut case_joueur"""
         return self.carte[self.posy][self.posx]
 
     def _set_case(self, new_case):
-        """Mutateur de l'attribut case.
+        """Mutateur de l'attribut case_joueur.
         Permet de modifier la case du joueur si le type existe."""
-        if new_case in cs.CONV:
-            self.carte[self.posy][self.posx] = new_case
+        self.set_case_type(new_case)
 
     case = property(_get_case, _set_case)
 
@@ -185,6 +184,15 @@ class Carte (object):
         del self.carte[-1]
         # On met à jour le nombre de lignes :
         self.nb_lignes -= 1
+
+    def get_case_info(self, x = self.posx, y = self.posy):
+        """Méthode utilisée pour obtenir le type de la case en x et y."""
+        return self.carte[y][x]
+
+    def set_case_type(self, x = self.posx, y = self.posy, new_type = cs.PLAINE):
+        """Méthode utilisée pour ramplacer le type de la case en x et y par new_type."""
+        if case in cs.CONV:
+            self.carte[y][x] = new_type
 
     def trouver_depart(self):
         """Trouve les coordonnées du départ et les range dans posx et posy."""
