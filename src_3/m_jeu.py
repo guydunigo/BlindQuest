@@ -224,8 +224,11 @@ class Jeu (object):
             # Au début :
             elif self.state == "debut" and symbol == pyglet.window.key.SPACE:
                 self.state = "normal"
+            # A la fin, on ferme la fenêtre et on relance le jeu :
             elif self.state == "fin" and symbol == pyglet.window.key.SPACE:
+                self.window.close()
                 self.__init__(self.carte.type_carte)
+                pyglet.app.run()
 
         @self.window.event
         def on_key_release(symbol, modifiers):
@@ -252,7 +255,7 @@ class Jeu (object):
                 pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x=20, y=20).draw()
             # Si le jeu est finit : on propose de redémarrer une partie :
             elif self.state == "fin":
-                pyglet.text.Label("Fin du jeu, appuyez sur la touche ESPACE pour recommencer une partie.").draw()
+                pyglet.text.Label("Fin du jeu, appuyez sur la touche ESPACE pour recommencer une partie...", x=20, y=20).draw()
             # Affichage de l'aide :
             if 'H' in self.state:
                 self.afficher_aide()
