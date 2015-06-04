@@ -116,27 +116,32 @@ class Jeu (object):
       - Les différents sons de proximité ont leur propre lecteur, en boucle.
     """
 
-        self.lecteurs = {}
-        for lecteur in ("env", "heartbeat"):
-            self.lecteurs[lecteur] = pyglet.media.Player()
-            # En boucle
-            self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
-            if lecteur == "env":
+        try :
+            self.lecteurs = {}
+            for lecteur in ("env", "heartbeat"):
+                self.lecteurs[lecteur] = pyglet.media.Player()
+                # En boucle
+                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+                if lecteur == "env":
+                    self.lecteurs[lecteur].volume = 0.7
+                if lecteur == "heartbeat":
+                    self.lecteurs[lecteur].queue(self.sons[lecteur])
+                    self.lecteurs[lecteur].volume = 3.0
+
+            # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
+            for lecteur in cs.PROX:
+                self.lecteurs[lecteur] = pyglet.media.Player()
+                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+                self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
                 self.lecteurs[lecteur].volume = 0.7
-            if lecteur == "heartbeat":
-                self.lecteurs[lecteur].queue(self.sons[lecteur])
-                self.lecteurs[lecteur].volume = 3.0
 
-        # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
-        for lecteur in cs.PROX:
-            self.lecteurs[lecteur] = pyglet.media.Player()
-            self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
-            self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-            self.lecteurs[lecteur].volume = 0.7
+            # On restitue l'environnement sonore de départ.
+            self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
+            self.lecteurs["env"].play()
 
-        # On restitue l'environnement sonore de départ.
-        self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
-        self.lecteurs["env"].play()
+        except AttributeError:
+            print(u"OpenAl n'est pas installé, veuillez l'installer si vous voulez jouer.")
+            raise(FileNotFoundError, u"## OpenAl is missing ! ##")
 
     def creer_fenetre(self):
         """Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
@@ -318,7 +323,7 @@ class Jeu (object):
 
         pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=240, width=self.window.width, multiline=True).draw()
         pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\n\
-↑ pour aller au nord, ↓ pour le sud, ← pour l'ouest, et → pour l'est \n\
+↑ pour aller au nord, ↓ pour le sud, ← pour l'ouest, et ⇥ pour l'est \n\
 P met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\n\
 E permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\n\
 Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=180, width=self.window.width, multiline=True).draw()

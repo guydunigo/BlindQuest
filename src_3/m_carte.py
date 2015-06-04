@@ -103,7 +103,7 @@ class Carte (object):
     def _set_case(self, new_case):
         """Mutateur de l'attribut case_joueur.
         Permet de modifier la case du joueur si le type existe."""
-        self.set_case_type(new_case)
+        self.set_case_type(new_case, self.posx, self.posy)
 
     case = property(_get_case, _set_case)
 
@@ -185,11 +185,11 @@ class Carte (object):
         # On met à jour le nombre de lignes :
         self.nb_lignes -= 1
 
-    def get_case_info(self, x = self.posx, y = self.posy):
+    def get_case_type(self, x=0, y=0):
         """Méthode utilisée pour obtenir le type de la case en x et y."""
         return self.carte[y][x]
 
-    def set_case_type(self, x = self.posx, y = self.posy, new_type = cs.PLAINE):
+    def set_case_type(self, x=0, y=0, new_type=cs.PLAINE):
         """Méthode utilisée pour remplacer le type de la case en x et y par new_type."""
         if new_type in cs.CONV:
             self.carte[y][x] = new_type
