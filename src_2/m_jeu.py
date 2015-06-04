@@ -15,7 +15,7 @@ import random
 
 # Importation du module Pyglet pour python 3. Si il n'est pas trouvé sur le système, on utilise la version présente dans le dossier src :
 import pyglet
-print u"Utilisation de la version de pyglet du dossier source (", pyglet.version, ").\n"
+print "Utilisation de la version de pyglet du dossier source (", pyglet.version, ").\n"
 
 # Importation des constantes :
 import constantes as cs
@@ -90,7 +90,7 @@ class Jeu (object):
     On charge les sons directement dans la mémoire sans streaming pour éviter les problèmes de 'source already queued'."""
 
         # On prévient que le temps de chargement est normal :
-        print u"Chargement des sons en mémoire..."
+        print(u"Chargement des sons en mémoire...")
 
         # On crée le dictionnaire de sons :
         self.sons = {}
@@ -105,9 +105,6 @@ class Jeu (object):
             # On ouvre les sons avec pyglet et on les range dans le dictionnaire 'sons' avec pour étiquette le nom du fichier son sans l'extension '.wav' :
             for son in liste_sons:
                 self.sons[son.replace(".wav", '')] = pyglet.media.load(os.path.join("sons", son), streaming=False)
-        else:
-            # On lève une erreur si le dossier 'sons' n'a pas été trouvé.
-            raise FileNotFoundError("Le dossier 'sons' n'a pas été trouvé.")
 
     def creer_lecteurs(self):
         """Crée les lecteurs pyglet, les lecteurs env, heartbeat, et les lecteurs de proximités (définis dans le fichier constantes) sont réglés pour tourner en boucle sur la musique en cours :
@@ -116,27 +113,32 @@ class Jeu (object):
       - Les différents sons de proximité ont leur propre lecteur, en boucle.
     """
 
-        self.lecteurs = {}
-        for lecteur in ("env", "heartbeat"):
-            self.lecteurs[lecteur] = pyglet.media.Player()
-            # En boucle
-            self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
-            if lecteur == "env":
+        try:
+            self.lecteurs = {}
+            for lecteur in ("env", "heartbeat"):
+                self.lecteurs[lecteur] = pyglet.media.Player()
+                # En boucle
+                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+                if lecteur == "env":
+                    self.lecteurs[lecteur].volume = 0.7
+                if lecteur == "heartbeat":
+                    self.lecteurs[lecteur].queue(self.sons[lecteur])
+                    self.lecteurs[lecteur].volume = 3.0
+
+            # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
+            for lecteur in cs.PROX:
+                self.lecteurs[lecteur] = pyglet.media.Player()
+                self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
+                self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
                 self.lecteurs[lecteur].volume = 0.7
-            if lecteur == "heartbeat":
-                self.lecteurs[lecteur].queue(self.sons[lecteur])
-                self.lecteurs[lecteur].volume = 3.0
 
-        # Création des lecteurs pour les sons de proximité, un lecteur par son, en boucle, volume faible.
-        for lecteur in cs.PROX:
-            self.lecteurs[lecteur] = pyglet.media.Player()
-            self.lecteurs[lecteur].eos_action = self.lecteurs[lecteur].EOS_LOOP
-            self.lecteurs[lecteur].queue(self.sons[cs.CONV[lecteur]])
-            self.lecteurs[lecteur].volume = 0.7
+            # On restitue l'environnement sonore de départ.
+            self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
+            self.lecteurs["env"].play()
 
-        # On restitue l'environnement sonore de départ.
-        self.lecteurs["env"].queue(self.sons[cs.CONV[cs.DEPART]])
-        self.lecteurs["env"].play()
+        except AttributeError:
+            print(u"OpenAl n'est pas installé, veuillez l'installer si vous voulez jouer.")
+            raise(ImportError, u"## OpenAl is missing ! ##")
 
     def creer_fenetre(self):
         """Crée la fenêtre pyglet en plein écran et affiche l'aide pendant 5 secondes."""
@@ -175,7 +177,7 @@ class Jeu (object):
                 self.num_sauv = ''
 
             # En cas de chargement :
-            if "C" in self.state:
+            elif "C" in self.state:
                 if symbol == pyglet.window.key.ENTER:
                     self.load()
                 elif symbol == pyglet.window.key.NUM_0 or symbol == pyglet.window.key._0:
@@ -219,6 +221,11 @@ class Jeu (object):
             # Au début :
             elif self.state == "debut" and symbol == pyglet.window.key.SPACE:
                 self.state = "normal"
+            # A la fin, on ferme la fenêtre et on relance le jeu :
+            elif self.state == "fin" and symbol == pyglet.window.key.SPACE:
+                self.window.close()
+                self.__init__(self.carte.type_carte)
+                pyglet.app.run()
 
         @self.window.event
         def on_key_release(symbol, modifiers):
@@ -243,6 +250,9 @@ class Jeu (object):
             # Si on est en pause, on l'indique :
             elif self.paused != []:
                 pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x=20, y=20).draw()
+            # Si le jeu est finit : on propose de redémarrer une partie :
+            elif self.state == "fin":
+                pyglet.text.Label("Fin du jeu, appuyez sur la touche ESPACE pour recommencer une partie...", x=20, y=20).draw()
             # Affichage de l'aide :
             if 'H' in self.state:
                 self.afficher_aide()
@@ -290,7 +300,7 @@ class Jeu (object):
                 case = self.carte.case
                 infos_prox = self.carte.detect_prox()
 
-            print "code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox
+            print("code case : ", cs.CONV[case], ", ", case, ", code proximité : ", infos_prox)
 
             # Restitution de l'environnement actuel :
             # Si la source est déjà active, on la remet au début :
@@ -313,11 +323,12 @@ class Jeu (object):
     def afficher_aide(self):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
 
-        pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=210, width=self.window.width, multiline=True).draw()
+        pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=240, width=self.window.width, multiline=True).draw()
         pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\n\
+↑ pour aller au nord, ↓ pour le sud, ← pour l'ouest, et ⇥ pour l'est \n\
 P met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\n\
 E permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\n\
-Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=150, width=self.window.width, multiline=True).draw()
+Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=180, width=self.window.width, multiline=True).draw()
 
     def fin(self, type_fin):
         """Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
@@ -383,9 +394,6 @@ Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la
                 message = u"Choisissez une sauvegarde à charger :\n"
                 for i, j in enumerate(liste_sauv):
                     message += u"{} : {}\n".format(i, j)
-                carte = "basic"
-                num = "0"
-                self.carte = mc.Carte(carte, num)
         else:
             message = u"Le dossier de sauvegardes ('saves') ne contient pas de sauvegardes."
 
@@ -424,7 +432,7 @@ Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la
 
         # Si on ne l'a pas tué, il réplique
         if self.vie_monstre > 0:
-            attaque = self.degats_monstre * self.attaque(50)
+            attaque = self.degats_monstre * self.attaque(70)
             self.vie -= attaque
             if attaque > 0:
                 self.sons[cs.MARTEAUHIT].play()

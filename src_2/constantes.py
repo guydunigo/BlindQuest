@@ -11,7 +11,7 @@
 # Définition des constantes
 
 # Carte utilisée :
-CARTE = "defaut"
+CARTE = "petite"
 
 # Quantité de vie du personnage :
 VIE = 10
@@ -44,23 +44,23 @@ FIN             = 99
 # Dictionnaire de conversion code de case -> nom du fichier son au format wav :
 
 CONV = {
-  PLAINE        : "BlindQuest-Plaine",
-  FORET         : "BlindQuest-Foret",
-  CAVERNE       : "BlindQuest-Caverne",
+  PLAINE        : "plaine",
+  FORET         : "foret",
+  CAVERNE       : "caverne",
   EAU           : "eau",
-  CHATEAU       : "BlindQuest-Chateau",
-  SENTIER       : "BlindQuest-Sentier",
+  CHATEAU       : "chateau",
+  SENTIER       : "sentier",
   PONT          : "pont",
   SABLE         : "sable",
   MONSTRE       : "monstre",
   BOSS          : "boss",
   BOSS_FINAL    : "boss_final",
-  BONUS         : "BlindQuest-Bonus",
+  BONUS         : "bonus",
   MER           : "mer",
-  ENTREECHATEAU : "entreechateau",
-  MAGIE         : "BlindQuest-Magie",
+  ENTREECHATEAU : "porte",
+  MAGIE         : "magie",
   FUNNY         : "NyanCatoriginal",
-  DEPART        : "BlindQuest-Theme",
+  DEPART        : "depart",
   FIN           : "fin"
 }
 
@@ -110,3 +110,49 @@ DANGER = {
   MER : NOYADE
 }
 
+##############################################################
+
+# Constantes de l'éditeur (couleurs, ...) :
+TAILLE_CASE = 15
+
+# Couleurs :
+COULEUR_PLAINE = ('c4B', (150,175,10,0)*4)                              # VERT CLAIR
+COULEUR_FORET = ('c4B', (0,100,0,0)*4)                                  # VERT FONCE
+COULEUR_CAVERNE = ('c4B', (100,50,0,0)*4)                               # MARRON
+COULEUR_EAU = ('c4B', (0,0,255,0)*4)                                    # BLEU
+COULEUR_CHATEAU = ('c4B', (150,150,150,0)*4)                            # GRIS CAIR
+COULEUR_SENTIER = ('c4B', (10,200,0,0)*4)                               # VERT MARRON
+COULEUR_PONT = ('c4B', (100,50,0,0)*2 + (200,100,0,0)*2)                # DEGRADE DE MARRON
+COULEUR_SABLE = ('c4B', (255,255,0,0)*4)                                # JAUNE
+COULEUR_MONTAGNE = ('c4B', (50,10,0,0)*4)                               # MARRON FONCE
+COULEUR_MONSTRE = ('c4B', (255,255,0,0)*2 + (200,70,0,0)*2)             # DEGRADE JAUNE - ORANGE
+COULEUR_BOSS = ('c4B', (200,200,0,0)*2 + (255,0,0,0)*2)                 # DEGRADE ORANGE - ROUGE
+COULEUR_BOSS_FINAL = ('c4B', (255,0,0,0)*2 + (0,0,0,0)*2)               # DEGRADE ROUGE - NOIR
+COULEUR_BONUS = ('c4B', (200,0,200,0)*4)                                # mauve (ou 'mave' selon la provenance)
+COULEUR_MER = ('c4B' , (20,20,100,0)*4)                                 # BLEU FONCE
+COULEUR_ENTREECHATEAU = ('c4B', (50,50,50,0)*4)                         # GRIS FONCE
+COULEUR_BORDURE = ('c4B', (0,)*16)                                      # NOIR
+COULEUR_DEPART = ('c4B', (255,255,255,0)*3 + (0,0,0,0))                 # DEGRADE BLANC - NOIR
+COULEUR_FIN = ('c4B', (0,0,0,0)*3 + (255,255,255,255))                  # DEGRADE NOIR - BLANC
+
+# Dico de correspondance des type/couleurs :
+COULEURS = {
+            PLAINE              : COULEUR_PLAINE,
+            FORET               : COULEUR_FORET,
+            CAVERNE             : COULEUR_CAVERNE,
+            EAU                 : COULEUR_EAU,
+            CHATEAU             : COULEUR_CHATEAU,
+            SENTIER             : COULEUR_SENTIER,
+            PONT                : COULEUR_PONT,
+            SABLE               : COULEUR_SABLE,
+            MONTAGNE            : COULEUR_MONTAGNE,
+            MONSTRE             : COULEUR_MONSTRE,
+            BOSS                : COULEUR_BOSS,
+            BOSS_FINAL          : COULEUR_BOSS_FINAL,
+            BONUS               : COULEUR_BONUS,
+            MER                 : COULEUR_MER,
+            ENTREECHATEAU       : COULEUR_ENTREECHATEAU,
+            BORDURE             : COULEUR_BORDURE,
+            DEPART              : COULEUR_DEPART,
+            FIN                 : COULEUR_FIN
+}

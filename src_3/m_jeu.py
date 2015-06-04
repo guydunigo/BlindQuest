@@ -473,5 +473,4 @@ Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la
 
     def run(self):
         """Lance la boucle de simulation pyglet."""
-
         pyglet.app.run()

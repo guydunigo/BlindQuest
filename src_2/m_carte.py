@@ -18,7 +18,7 @@ import constantes as cs
 class Carte (object):
     """Classe qui gère la carte et s'occupe de l'emplacement et du déplacement du joueur."""
 
-    def __init__(self, type_carte="defaut", num_sauv=None):
+    def __init__(self, type_carte="basic", num_sauv=None):
         """Constructeur : Charge la carte dans une liste de listes (attribut carte) et définit la position par défaut du joueur (attributs posx et posy), et stocke le nom de la carte (attribut type_carte).
         Il existe un attribut 'case' qui donne le type de case sur laquelle le joueur se trouve, cet attribut permet aussi de modifier cette case.
         - Arguments :
@@ -44,6 +44,19 @@ class Carte (object):
             self.ouvrir_fichier_carte("saves", type_carte + "_" + num_sauv)
             self.get_player_info()
 
+    def __repr__(self):
+        """Méthode spéciale appelée lors d'un print de l'objet.
+        En clair : print(carte) donne un tableau de valeurs de la carte comme représenté dans le fichier carte."""
+        string = ""
+        for i in self.carte:
+            for j in i:
+                if len(str(j)) == 1:
+                    string += '0' + str(j) + ' '
+                else:
+                    string += str(j) + ' '
+            string += '\n'
+        return string
+
     # Encapsulation pour l’abscisse du joueur (posx) :
     def _get_posx(self):
         """Accesseur de l'attribut posx"""
@@ -53,13 +66,13 @@ class Carte (object):
         """Mutateur de l'attribut posx.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posx dépasse les limites de la carte, on retourne de l'autre côté."""
-        if new_posx < 0:
-            new_posx = self.nb_colonnes + new_posx
-        elif new_posx >= self.nb_colonnes:
-            new_posx -= self.nb_colonnes
-        if new_posx >= 0 and new_posx < self.nb_colonnes:
-            if self.carte[self.posy][new_posx] not in cs.NOGO:
-                self._posx = new_posx
+        while new_posx < 0 or new_posx >= self.nb_colonnes:
+            if new_posx < 0:
+                new_posx = self.nb_colonnes + new_posx
+            elif new_posx >= self.nb_colonnes:
+                new_posx -= self.nb_colonnes
+        if self.get_case_type(new_posx, self.posy) not in cs.NOGO:
+            self._posx = new_posx
 
     posx = property(_get_posx, _set_posx)
 
@@ -72,27 +85,49 @@ class Carte (object):
         """Mutateur de l'attribut posy.
         Si la nouvelle valeur est sur la carte et n'est pas un lieu impraticable (définis dans le fichier 'constantes.py'), alors elle est attribuée à l'attribut.
         Si new_posy dépasse les limites de la carte, on retourne de l'autre côté."""
-        if new_posy < 0:
-            new_posy = self.nb_lignes + new_posy
-        elif new_posy >= self.nb_lignes:
-            new_posy -= self.nb_lignes
-        if self.carte[new_posy][self.posx] not in cs.NOGO:
+        while new_posy < 0 or new_posy >= self.nb_lignes:
+            if new_posy < 0:
+                new_posy = self.nb_lignes + new_posy
+            elif new_posy >= self.nb_lignes:
+                new_posy -= self.nb_lignes
+        if self.get_case_type(self.posx, new_posy) not in cs.NOGO:
             self._posy = new_posy
 
     posy = property(_get_posy, _set_posy)
 
     # Encapsulation pour la case du joueur :
     def _get_case(self):
-        """Accesseur de l'attribut case"""
-        return self.carte[self.posy][self.posx]
+        """Accesseur de l'attribut case_joueur"""
+        return self.get_case_type(self.posx, self.posy)
 
     def _set_case(self, new_case):
-        """Mutateur de l'attribut case.
+        """Mutateur de l'attribut case_joueur.
         Permet de modifier la case du joueur si le type existe."""
-        if new_case in cs.CONV:
-            self.carte[self.posy][self.posx] = new_case
+        self.set_case_type(self.posx, self.posy, new_case)
 
     case = property(_get_case, _set_case)
+
+    # Encapsulation pour le nombre de colonnes :
+    def _get_nb_colonnes(self):
+        """Renvoie le nombre de colonnes de la carte, toutes les lignes ont le même nombre de colonnes)."""
+        return len(self.carte[0])
+
+    def _set_nb_colonnes(self, new):
+        """On ne peut modifier le nombre de colonnes."""
+        pass
+
+    nb_colonnes = property(_get_nb_colonnes, _set_nb_colonnes)
+
+    # Encapsulation pour le nombre de lignes :
+    def _get_nb_lignes(self):
+        """Renvoie le nombre de lignes"""
+        return len(self.carte)
+
+    def _set_nb_lignes(self, new):
+        """On ne peut modifier le nombre de lignes."""
+        pass
+
+    nb_lignes = property(_get_nb_lignes, _set_nb_lignes)
 
     def ouvrir_fichier_carte(self, dossier, nom_fichier):
         """Charge la carte du fichier nommé 'nom_fichier.txt', présent dans le dossier donné (classiquement saves ou cartes), sous la forme d'un liste de listes d'entiers.
@@ -103,7 +138,7 @@ class Carte (object):
             with open(os.path.join(dossier, str(nom_fichier) + ".txt"), 'r') as fichier_carte:
                 self.charger_carte(fichier_carte)
         else:
-            raise NameError("Il n'existe pas de fichier carte nommé {} dans le dossier '{}'.".format(nom_fichier + ".txt", dossier))
+            raise ImportError("Il n'existe pas de fichier carte nommé {} dans le dossier '{}'.".format(nom_fichier + ".txt", dossier))
 
     def charger_carte(self, fichier_carte):
         """Charge le contenu d'un fichier carte dans une liste de liste de int, si les lignes ne sont pas toutes de la même taille, on les complète par de l'eau."""
@@ -124,18 +159,16 @@ class Carte (object):
         if self.carte[-1] == []:
             del(self.carte[-1])
 
-        # On compte le nombre de lignes :
-        self.nb_lignes = len(self.carte)
         # On compte le nombre de colonnes et on complète les lignes de taille différente par de l'eau
         # Init la variable :
-        self.nb_colonnes = 0
+        nb_colonnes = 0
         # On recherche la ligne la plus grande :
         for liste in self.carte:
-            if self.nb_colonnes < len(liste):
-                self.nb_colonnes = len(liste)
+            if nb_colonnes < len(liste):
+                nb_colonnes = len(liste)
         # On complète par de l'eau:
         for liste in self.carte:
-            while len(liste) < self.nb_colonnes:
+            while len(liste) < nb_colonnes:
                 liste.append(cs.EAU)
 
     def get_player_info(self):
@@ -152,6 +185,15 @@ class Carte (object):
         # On met à jour le nombre de lignes :
         self.nb_lignes -= 1
 
+    def get_case_type(self, x=0, y=0):
+        """Méthode utilisée pour obtenir le type de la case en x et y."""
+        return self.carte[y][x]
+
+    def set_case_type(self, x=0, y=0, new_type=cs.PLAINE):
+        """Méthode utilisée pour remplacer le type de la case en x et y par new_type."""
+        if new_type in cs.CONV:
+            self.carte[y][x] = new_type
+
     def trouver_depart(self):
         """Trouve les coordonnées du départ et les range dans posx et posy."""
 
@@ -164,7 +206,7 @@ class Carte (object):
             i = 0
             # Boucle des abscisses :
             while not found and i < len(self.carte):
-                if self.carte[j][i] == cs.DEPART:
+                if self.get_case_type(i, j) == cs.DEPART:
                     self._posx, self._posy = i, j
                     found = True
                 i += 1
@@ -208,24 +250,24 @@ class Carte (object):
         # On regarde si les différents types qui doivent être détectés sont à proximité :
         for prox in cs.PROX:
             # NORD :
-            if self.carte[self.posy - 1][self.posx] == prox:
+            if self.get_case_type(self.posx, self.posy - 1) == prox:
                 detect |= cs.PROX[prox]
             # SUD :
             if self.posy < self.nb_lignes - 1:
-                if self.carte[self.posy + 1][self.posx] == prox:
+                if self.get_case_type(self.posx, self.posy + 1) == prox:
                     detect |= cs.PROX[prox]
             else:
-                if self.carte[0][self.posx] == prox:
+                if self.get_case_type(self.posx, 0) == prox:
                     detect |= cs.PROX[prox]
             # OUEST :
-            if self.carte[self.posy][self.posx - 1] == prox:
+            if self.get_case_type(self.posx - 1, self.posy) == prox:
                 detect |= cs.PROX[prox]
             # EST :
             if self.posx < self.nb_colonnes - 1:
-                if self.carte[self.posy][self.posx + 1] == prox:
+                if self.get_case_type(self.posx + 1, self.posy) == prox:
                     detect |= cs.PROX[prox]
             else:
-                if self.carte[self.posy][0] == prox:
+                if self.get_case_type(0, self.posy) == prox:
                     detect |= cs.PROX[prox]
 
         return detect
@@ -241,9 +283,9 @@ class Carte (object):
         # On parcoure les cases aux points cardinaux :
         for x, y in [(self.posx - 1, self.posy), (self.posx + 1, self.posy), (self.posx, self.posy - 1), (self.posx, self.posy + 1)]:
             # Si la case n'est pas la case départ, un bonus, une case de combat, de non go, on affecte la nouvelle valeur :
-            if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.carte[y][x] not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.carte[y][x] not in cs.COMBAT_START:
+            if not redefinie and x >= 0 and x < self.nb_colonnes - 1 and y >= 0 and y < self.nb_lignes - 1 and self.get_case_type(x, y) not in cs.NOGO + (cs.DEPART, cs.BONUS) and self.get_case_type(x, y) not in cs.COMBAT_START:
                 # On affecte la nouvelle valeur :
-                self.case = self.carte[y][x]
+                self.case = self.get_case_type(x, y)
                 # On indique que l'on a redéfini la case :
                 redefinie = True
 
