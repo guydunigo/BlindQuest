@@ -52,5 +52,19 @@ S pour sauvegarder une partie
 
 C pour charger une partie
 
+La bibliothèque Openal est nécessaire au bon fonctionnement du jeu
+ArchLinux : 
+ # pacman -S openal
+Ubuntu/Debian :
+ # apt-get install libopenal1
+Fedora :
+ # yum install openal
+Mac : installé par défaut
+Windows : un fichier d'installation est disponible dans le dossier "divers"
+
+Pour lancer le jeu : 
+Sous GNU/Linux & Mac : Depuis le dossier du jeu dans un terminal : sh ./blindquest.sh
+Sous windows : Lancer le fichier blindquest_win_py2.bat ou blindquest_win_py3.bat selon la version de python installée. 
+
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Licence Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">BlindQuest</span> de <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">CARON, GOÑI, TAUPIAC</span> est mis à disposition selon les termes de la <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">licence Creative Commons Attribution - Pas d&#39;Utilisation Commerciale - Pas de Modification 4.0 International</a>.
