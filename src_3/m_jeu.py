@@ -316,11 +316,12 @@ class Jeu (object):
     def afficher_aide(self):
         """Fonction qui affiche l'aide (tiens, tiens...)."""
 
-        pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=210, width=self.window.width, multiline=True).draw()
+        pyglet.text.Label(u"\t\t\t\tBienvenue dans BlindQuest !\nVous traquerez les monstres en parcourant le monde grâce aux flèches directionnelles.", color=(255, 55, 25, 255), x=20, y=240, width=self.window.width, multiline=True).draw()
         pyglet.text.Label(u"La touche H vous permet d'afficher de nouveau cette aide.\n\
+↑ pour aller au nord, ↓ pour le sud, ← pour l'ouest, et ⇥ pour l'est \n\
 P met le jeu en pause et reprend la partie.\nF active et désactive le plein écran.\n\
 E permet d'attaquer lors d'un combat.\nÉCHAP permet de quitter le jeu à tout moment.\n\
-Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=150, width=self.window.width, multiline=True).draw()
+Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la touche S.", color=(140, 140, 140, 255), x=20, y=180, width=self.window.width, multiline=True).draw()
 
     def fin(self, type_fin):
         """Fonction qui gère la fin selon s'il y a victoire ou mort, et s'occupe de quitter le programme.
