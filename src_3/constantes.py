@@ -35,6 +35,8 @@ BOSS_FINAL      = 12
 BONUS           = 13
 MER             = 14
 ENTREECHATEAU   = 15
+MAGIE           = 16
+FUNNY           = 17
 BORDURE         = 97
 DEPART          = 98
 FIN             = 99
@@ -42,21 +44,23 @@ FIN             = 99
 # Dictionnaire de conversion code de case -> nom du fichier son au format wav :
 
 CONV = {
-  PLAINE        : "plaine",
-  FORET         : "foret",
-  CAVERNE       : "caverne",
+  PLAINE        : "BlindQuest-Plaine",
+  FORET         : "BlindQuest-Foret",
+  CAVERNE       : "BlindQuest-Caverne",
   EAU           : "eau",
-  CHATEAU       : "chateau",
-  SENTIER       : "sentier",
+  CHATEAU       : "BlindQuest-Chateau",
+  SENTIER       : "BlindQuest-Sentier",
   PONT          : "pont",
   SABLE         : "sable",
   MONSTRE       : "monstre",
   BOSS          : "boss",
   BOSS_FINAL    : "boss_final",
-  BONUS         : "bonus",
+  BONUS         : "BlindQuest-Bonus",
   MER           : "mer",
   ENTREECHATEAU : "entreechateau",
-  DEPART        : "depart",
+  MAGIE         : "BlindQuest-Magie"
+  FUNNY         : "NyanCatoriginal"
+  DEPART        : "BlindQuest-Theme",
   FIN           : "fin"
 }
 
