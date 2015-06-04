@@ -40,7 +40,7 @@ class Jeu (object):
         pyglet.resource.reindex()
 
         # On choisit d'utiliser openal pour l'audio. (pulseaudio ne marchait pas (segfaults))
-        pyglet.options['audio'] = ('openal', )
+        pyglet.options['audio'] = ('openal',)
 
         # Chargement de la carte :
         self.carte = mc.Carte(type_carte)
@@ -243,6 +243,8 @@ class Jeu (object):
             # Si on est en pause, on l'indique :
             elif self.paused != []:
                 pyglet.text.Label("Partie en pause, appuyez sur la touche P pour reprendre...", x=20, y=20).draw()
+            # Si le jeu est finit : on propose de redémarrer une partie :
+            elif self.state
             # Affichage de l'aide :
             if 'H' in self.state:
                 self.afficher_aide()
