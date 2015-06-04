@@ -421,7 +421,7 @@ Enfin, appuyez sur C pour charger une partie préalablement sauvegardée avec la
 
         # Si on ne l'a pas tué, il réplique
         if self.vie_monstre > 0:
-            attaque = self.degats_monstre * self.attaque(50)
+            attaque = self.degats_monstre * self.attaque(70)
             self.vie -= attaque
             if attaque > 0:
                 self.sons[cs.MARTEAUHIT].play()
