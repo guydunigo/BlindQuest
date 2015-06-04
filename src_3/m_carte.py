@@ -190,8 +190,8 @@ class Carte (object):
         return self.carte[y][x]
 
     def set_case_type(self, x = self.posx, y = self.posy, new_type = cs.PLAINE):
-        """Méthode utilisée pour ramplacer le type de la case en x et y par new_type."""
-        if case in cs.CONV:
+        """Méthode utilisée pour remplacer le type de la case en x et y par new_type."""
+        if new_type in cs.CONV:
             self.carte[y][x] = new_type
 
     def trouver_depart(self):
