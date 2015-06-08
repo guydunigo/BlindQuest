@@ -309,9 +309,6 @@ class Jeu (object):
             # Si la source est déjà active, on la remet au début :
             if self.lecteurs["env"].source == self.sons[cs.CONV[case]] or self.lecteurs["env"].source in [self.sons[cs.CONV[i]] for i in cs.COMBAT_START]:
                 self.lecteurs["env"].seek(0)
-            elif case in cs.COMBAT_START:
-                self.lecteurs["env"].queue(self.sons[cs.COMBAT])
-                self.lecteurs["env"].next_source()
             else:
                 self.lecteurs["env"].queue(self.sons[cs.CONV[case]])
                 self.lecteurs["env"].next_source()
