@@ -34,8 +34,8 @@ case $arg in
 Comment[fr]=
 Comment=
 Exec=sh ./blindquest.sh
-GenericName[fr]=Jeu d'aventur
-GenericName=Jeu d'aventure
+GenericName[fr]=Jeu d'aventure
+GenericName=Adventure Game
 Icon="$(pwd)"/blindquest.png
 MimeType=
 Name[fr]=BlindQuest
