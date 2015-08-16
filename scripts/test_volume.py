@@ -1,4 +1,4 @@
-import pyglet
+﻿import pyglet
 import time
 import sys
 
@@ -21,4 +21,5 @@ def on_key_press(symbol, modifiers):
 	elif symbol == pyglet.window.key.DOWN:
 		players["eau"].volume -= 0.01
 	print(players["eau"].volume, players["env"].volume)
+
 pyglet.app.run()
