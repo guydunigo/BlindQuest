@@ -67,9 +67,9 @@ target/
 .kdev4/
 
 ### Visual Studio ###
+.vs/
 *.pyperf
 *.pyproj
 *.sln
-.vs/
 
 saves/
