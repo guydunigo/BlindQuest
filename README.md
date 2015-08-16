@@ -60,6 +60,8 @@ Ubuntu/Debian : sudo apt-get install libopenal1
 
 Fedora : sudo yum install openal
 
+OpenSUSE : sudo zypper install libopenal1
+
 Mac : installé par défaut
 
 Windows : un fichier d'installation est disponible dans le dossier "divers"
