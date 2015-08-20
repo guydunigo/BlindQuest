@@ -8,7 +8,7 @@ import pyglet
 #Tous les paramètres sont facultatifs (les valeurs données ci-dessous sont celles par défaut).
 #(text='', font_name=None, font_size=None, bold=False, italic=False, color=(255, 255, 255, 255), x=0, y=0, width=None, height=None, anchor_x='left', anchor_y='baseline', align='left', multiline=False)
 
-#Exemple de texte simple en blanc, bas à gauche de l'écran... :
+#Exemple de texte simple en blanc, situé en bas à gauche de l'écran... :
 TEXT = pyglet.text.Label("Salut, comment ça va ?")
 
 #multiline à True si tu veux afficher sur plusieurs lignes (width doit être un int dans ce cas)

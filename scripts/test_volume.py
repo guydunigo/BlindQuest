@@ -1,4 +1,5 @@
-﻿import pyglet
+﻿#Montre comment modifier le volume d'un lecteur avec pyglet (utilisation des flèches HAUT et BAS).
+import pyglet
 import time
 import sys
 
