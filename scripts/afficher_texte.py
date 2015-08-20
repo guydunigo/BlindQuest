@@ -3,7 +3,7 @@ import pyglet
 
 #Voilà les différentes options du constructeur de l'objet Label de pyglet (cadre de texte).
 #Accessible via : pyglet.text.Label([args]).
-#Pour plus d'informations, tapez : "import pyglet", puis : "help(pyglet.text.Label)" dans python.
+#Pour plus d'informations, taper : "import pyglet", puis : "help(pyglet.text.Label)" dans python.
 
 #Tous les paramètres sont facultatifs (les valeurs données ci-dessous sont celles par défaut).
 #(text='', font_name=None, font_size=None, bold=False, italic=False, color=(255, 255, 255, 255), x=0, y=0, width=None, height=None, anchor_x='left', anchor_y='baseline', align='left', multiline=False)
