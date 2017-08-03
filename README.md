@@ -1,6 +1,6 @@
-# Jeu-Python-S2
-Fichier README.TXT
-Projet de Méthode de Développement de S2 à L'ENIB
+![BlindQuest](./divers/logo/logo.png)
+
+# Blindquest
 
 BlindQuest est un petit jeu de rôle exclusivement basé sur le son. Le but est de trouver le boss final et de le vaincre.
 
@@ -54,13 +54,13 @@ C pour charger une partie
 
 La bibliothèque Openal est nécessaire au bon fonctionnement du jeu :
 
-ArchLinux : sudo pacman -S openal
+ArchLinux : `$ sudo pacman -S openal`
 
-Ubuntu/Debian : sudo apt-get install libopenal1
+Ubuntu/Debian : `$ sudo apt-get install libopenal1`
 
-Fedora : sudo yum install openal
+Fedora : `$ sudo yum install openal`
 
-OpenSUSE : sudo zypper install libopenal1
+OpenSUSE : `$ sudo zypper install libopenal1`
 
 Mac : installé par défaut
 
