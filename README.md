@@ -23,7 +23,7 @@ Commandes :
 
 **E** permet d’attaquer lors d’un combat
 
-**ÉCHAP** permet d’attaquer lors d’un combat
+**ÉCHAP** permet de quitter le jeu
 
 **S** pour sauvegarder une partie
 
